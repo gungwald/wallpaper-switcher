@@ -7,5 +7,5 @@ set TOPDIR=%~dp0..
 set CLASSPATH=%TOPDIR%\classes
 title %MAINCLASS%
 for %%j in ("%TOPDIR%\lib\*.jar") do set CLASSPATH=!CLASSPATH!;%%~j
-java -classpath %CLASSPATH% %MAINCLASS%
+java -classpath "%CLASSPATH%" %MAINCLASS%
 endlocal
