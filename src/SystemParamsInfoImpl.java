@@ -6,15 +6,15 @@ import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
 
 
-public class SystemParamsInfoImpl implements SystemParamsInfoIface {
+public class SystemParamsInfoImpl implements SystemParamsInfo {
 
-    private SystemParamsInfoIface iface = null;
+    private SystemParamsInfo iface = null;
 
     public SystemParamsInfoImpl() {
         HashMap<Object,Object> options = new HashMap<Object,Object>();
         options.put(OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
         options.put(OPTION_FUNCTION_MAPPER, W32APIFunctionMapper.UNICODE);
-        iface = (SystemParamsInfoIface) Native.loadLibrary("user32", SystemParamsInfoIface.class, options);
+        iface = (SystemParamsInfo) Native.loadLibrary("user32", SystemParamsInfo.class, options);
     }
 
     public boolean SystemParamsInfo(long uiAction, long uiParam, String pvParam, long fWinIni) {

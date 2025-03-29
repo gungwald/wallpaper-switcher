@@ -30,9 +30,9 @@ public class User {
     }
     
     public void setWallpaper(Path path) {
-        impl.SystemParamsInfo(SystemParamsInfoIface.SPI_SETDESKWALLPAPER, 0, 
+        impl.SystemParamsInfo(SystemParamsInfo.SPI_SETDESKWALLPAPER, 0,
                 path.toAbsolutePath().toString(), 
-                SystemParamsInfoIface.SPIF_UPDATEINIFILE | SystemParamsInfoIface.SPIF_SENDWININICHANGE);
+                SystemParamsInfo.SPIF_UPDATEINIFILE | SystemParamsInfo.SPIF_SENDWININICHANGE);
     }
     
 }

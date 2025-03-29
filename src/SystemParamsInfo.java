@@ -1,7 +1,7 @@
 import com.sun.jna.platform.win32.WinDef.UINT_PTR;
 import com.sun.jna.win32.StdCallLibrary;
 
-public interface SystemParamsInfoIface extends StdCallLibrary {
+public interface SystemParamsInfo extends StdCallLibrary {
 
     // from MSDN article
     public long SPI_SETDESKWALLPAPER = 20;
