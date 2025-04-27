@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="WallpaperSwitcher:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/WallpaperSwitcher_jar</output-path>
+    <root id="archive" name="WallpaperSwitcher.jar">
+      <element id="module-output" name="WallpaperSwitcher" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jna-4.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jna-platform-4.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.4.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
