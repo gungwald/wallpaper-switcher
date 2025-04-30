@@ -1,11 +1,6 @@
 import com.microsoft.windows.Wallpaper;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,18 +11,18 @@ public class WallpaperSwitcher {
     public static void main(String[] args) {
         try {
             WallpaperSwitcher ws = new WallpaperSwitcher();
-            ws.engage();
+            ws.execute();
         }
         catch (Exception e) {
             logger.log(Level.SEVERE, "Caught exception in main", e);
         }
     }
 
-    private void engage() throws IOException {
+    private void execute() throws IOException {
+        Wallpaper wallpaper = new Wallpaper();
         BingWallpaperAcquirer bing = new BingWallpaperAcquirer();
         while (true) {
-            File f = bing.next();
-            Wallpaper.set(f);
+            wallpaper.set(bing.next());
             sleep(1);
         }
     }
@@ -38,7 +33,7 @@ public class WallpaperSwitcher {
             Thread.sleep(minutes * 60 * 1000);
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Caught exception in sleep", e);
         }
     }
     

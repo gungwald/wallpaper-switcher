@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This DOCTYPE tag shuts off the warning from Eclipse that there is no DTD
+     associated with this XML file. -->
+
+<!DOCTYPE project>
+
+<project name="wallpaper-switcher" default="jar" basedir=".">
+
+    <property name="main.class" value="WallpaperSwitcher"/>
+    <property name="version" value="2.0.0"/>
+    <property name="lang.version" value="1.5"/>
+    <property name="src.dir" value="src"/>
+   	<property name="java.compiler" value="${java.home}/../bin/javac" />
+    <property name="build.dir" value="build"/>
+<!--    <property name="dist.dir" value="src/main/dist"/>-->
+    <property name="cls.dir" value="${build.dir}/classes"/>
+    <property name="libs.dir" value="${build.dir}/libs"/>
+    <property name="app.jar" value="${libs.dir}/${ant.project.name}.jar"/>
+    <property name="run.script" value="bin/${ant.project.name}.bat"/>
+    <property name="sys.install.dir" value="/usr/local"/>
+    <property name="bld.dist.dir" value="${build.dir}/distribution"/>
+
+    <path id="dependency.jars">
+        <fileset dir="lib">
+            <include name="gson-2.4.jar"/>
+            <include name="jna-4.0.0.jar"/>
+            <include name="jna-platform-4.0.0.jar"/>
+        </fileset>
+    </path>
+
+    <target name="setup" description="Sets stuff up">
+        <mkdir dir="${cls.dir}"/>
+        <mkdir dir="${libs.dir}"/>
+    </target>
+
+    <target name="compile" depends="setup" description="Compiles the source">
+        <javac srcdir="${src.dir}" destdir="${cls.dir}"
+               debug="on" source="${lang.version}" target="${lang.version}"
+               includeAntRuntime="false" fork="yes" executable="${java.compiler}">
+            <classpath refid="dependency.jars"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile" description="Builds an executable jar file">
+        <copy todir="${cls.dir}" flatten="true">
+            <path refid="dependency.jars"/>
+        </copy>
+        <jar destfile="${app.jar}" basedir="${cls.dir}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="userInstall" depends="jar" description="Installs into $HOME/bin and $HOME/lib">
+        <mkdir dir="${user.home}/bin"/>
+        <copy file="${run.script}" todir="${user.home}/bin" preservelastmodified="true"/>
+        <chmod file="${user.home}/bin/${ant.project.name}" perm="ugo+rx"/>
+        <mkdir dir="${user.home}/lib"/>
+        <copy file="${app.jar}" todir="${user.home}/lib" preservelastmodified="true"/>
+        <exec dir="${user.home}/bin" executable="cmd.exe" osfamily="windows">
+            <arg line="bin/addtopath.bat"/>
+        </exec>
+    </target>
+
+    <target name="systemInstall" depends="jar" description="Installs into /usr/local/bin and /usr/local/lib">
+        <mkdir dir="${sys.install.dir}/bin"/>
+        <copy file="${run.script}" todir="${sys.install.dir}/bin" preservelastmodified="true"/>
+        <chmod file="${sys.install.dir}/bin/${ant.project.name}" perm="ugo+rx"/>
+        <mkdir dir="${sys.install.dir}/lib"/>
+        <copy file="${app.jar}" todir="${sys.install.dir}/lib" preservelastmodified="true"/>
+    </target>
+
+    <target name="distZip" depends="jar" description="Build a zip file with just binaries for distribution to users">
+        <mkdir dir="${bld.dist.dir}"/>
+        <move file="build/libs" tofile="build/lib"/>
+        <zip destfile="${bld.dist.dir}/${ant.project.name}-${version}-bin.zip">
+            <fileset dir="." includes="bin/*"/>
+            <fileset dir="${build.dir}" includes="lib/${ant.project.name}-${version}.jar"/>
+        </zip>
+        <move file="${build.dir}/lib" tofile="build/libs"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+</project>
+

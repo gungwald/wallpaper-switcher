@@ -61,11 +61,13 @@ public class Wallpaper {
     @SuppressWarnings("SpellCheckingInspection")
     protected static native boolean SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
 
+    public Wallpaper() {}
+
     /**
      * Sets the damn wallpaper.
      * @param wallpaper File containing the image for the wallpaper
      */
-    public static void set(File wallpaper) {
+    public void set(File wallpaper) {
         SystemParametersInfo(
                 new UINT(SPI_SETDESKWALLPAPER),
                 new UINT(0),

@@ -27,7 +27,7 @@ public class User {
     }
     
     public void setWallpaper(File f) {
-        Wallpaper.set(f);
+        new Wallpaper().set(f);
     }
     
 }
