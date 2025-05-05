@@ -102,6 +102,10 @@
         <move file="${build.dir}/lib" tofile="build/libs"/>
     </target>
 
+    <target name="run" depends="jar" description="Run Jar file">
+        <java jar="${app.jar}" fork="true"/>
+    </target>
+
     <target name="wine" depends="jar" description="Run Jar file with Wine">
         <exec executable="wine">
             <arg value="C:\Program Files (x86)\Java\jdk8u452-b09\bin\java.exe"/>

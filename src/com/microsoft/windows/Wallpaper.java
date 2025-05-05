@@ -2,19 +2,22 @@ package com.microsoft.windows;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.*;
 import com.sun.jna.platform.win32.WinDef.UINT;
 import com.sun.jna.win32.W32APIOptions;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Encapsulates the mess required to set the wallpaper on Windows.
  */
 public class Wallpaper {
+
+    private static final Logger logger = Logger.getLogger(Wallpaper.class.getName());
 
     /**
      * <code>uiAction</code> value for the SystemParametersInfo function that specifies that the wallpaper should be set
@@ -79,6 +82,10 @@ public class Wallpaper {
      * @param wallpaper File containing the image for the wallpaper
      */
     public void set(File wallpaper) {
+        logger.entering(Wallpaper.class.getName(), "set", wallpaper);
+        // Set it in the registry
+        Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", wallpaper.getAbsolutePath());
+        // And also call the normal function. It is necessary to do both for some reason.
         boolean success =
                 SystemParametersInfo(
                         new UINT(SPI_SETDESKWALLPAPER),
@@ -87,8 +94,12 @@ public class Wallpaper {
                         new UINT(SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
                 );
 
+        logger.log(Level.INFO, "Last error: " + String.valueOf(Kernel32.INSTANCE.GetLastError()));
         if (! success) {
-            throw new Win32Exception(Kernel32.INSTANCE.GetLastError());
+            Win32Exception e = new Win32Exception(Kernel32.INSTANCE.GetLastError());
+            logger.throwing(Wallpaper.class.getName(), "set", e);
+            throw e;
         }
+        logger.exiting(Wallpaper.class.getName(), "set");
     }
 }
