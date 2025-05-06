@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 public class WallpaperSwitcher {
 
-    private static final Level LOGGING_LEVEL = Level.INFO;
+    private static final Level LOGGING_LEVEL = Level.SEVERE;
     private static final String CLASS_NAME = WallpaperSwitcher.class.getName();
     private static final Logger LOGGER = Logger.getLogger(CLASS_NAME);
 

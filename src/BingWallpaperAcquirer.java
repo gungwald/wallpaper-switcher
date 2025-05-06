@@ -27,15 +27,11 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
         logger.info("Reading Bing wallpaper metadata from: " + info.toString());
-        String jsonText = readAllChars(info);
-        logger.info("Read info: " + jsonText);
-        JsonObject json = new Gson().fromJson(jsonText, JsonObject.class);
-        logger.info("JSON object: " + jsonText);
-        JsonObject firstImage = json.get("images").getAsJsonArray().get(0).getAsJsonObject();
-        String path = firstImage.get("url").getAsString();
-        String wallpaperUrlText = "http://bing.com" + path;
-        logger.info("images[0].url: " + jsonText);
-        URL wallpaperUrl = new URL(wallpaperUrlText);
+        Reader wpInfoReader = new InputStreamReader(info.openStream());
+//        String jsonText = readAllChars(info);
+//        logger.info("Read info: " + jsonText);
+        BingWallpaperInfo wpInfo = new Gson().fromJson(wpInfoReader, BingWallpaperInfoResponse.class).images[0];
+        URL wallpaperUrl = new URL("http://bing.com" + wpInfo.url);
         byte[] wallpaper = readAllBytes(wallpaperUrl);
         logger.info("Reading wallpaper from " + wallpaperUrl.toString());
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
