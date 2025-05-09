@@ -12,35 +12,104 @@
     <property name="version" value="2.0.0"/>
     <property name="lang.version" value="1.5"/>
     <property name="src.dir" value="src"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="one-jar.jar" value="${lib.dir}/one-jar-ant-task-0.97.jar"/>
    	<property name="java.compiler" value="${java.home}/../bin/javac" />
     <property name="build.dir" value="build"/>
-<!--    <property name="dist.dir" value="src/main/dist"/>-->
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
-    <property name="app.jar" value="${libs.dir}/${ant.project.name}.jar"/>
+
+    <!-- The following naming proposal should only affect executable jars, not
+         regular library jars. It is to differentiate between a self-contained
+         executable jar and an executable jar that still has its dependencies
+         outside itself. A jar without a ~something appended to the name can
+         be assumed to be a library jar that is not executable and has
+         no dependencies included, like those uploaded to Maven Central.
+         -->
+
+    <!-- The tilde is necessary so you can tell that the following word is not
+         part of the application name. Dashes separate words in the application
+         name. So those cannot be used. It is the best separator. A dot would
+         indicate a file type, which it is not. It is just an adjective. Other
+         symbols either look terrible or are not allowed in UN*X or Windows
+         file names.
+
+         Nonautonomous jar name possibilities:
+             wallpaper-switcher~nonautonomous.jar   - way too long and hard to pronounce
+             wallpaper-switcher~dependent.jar       - because it has dependencies
+             wallpaper-switcher~isolated.jar        - isolated from its dependencies
+             wallpaper-switcher~slim.jar            - opposite of fat
+             wallpaper-switcher~simple.jar          - opposite of uber, kind of
+             -->
+    <property name="jar" value="${libs.dir}/${ant.project.name}~dependent.jar"/>
+
+    <!-- A better description than "uber", or "fat" or "executable" would be
+         self-contained. But it is very long. Also, "autonomous" would be good,
+         except that it is long:
+             wallpaper-switcher~autonomous.jar      - best captures function and data
+             wallpaper-switcher~self-contained.jar  - doesn't describe exec
+             wallpaper-switcher~uber.jar            - doesn't describe exec or autonomous
+             wallpaper-switcher~fat.jar             - doesn't describe exec or autonomous
+             wallpaper-switcher~exe.jar             - same as exec below
+             wallpaper-switcher~exec.jar            - good but misses autonomous meaning
+                                                      because exec jar could have dependent
+                                                      jars outside itself
+             -->
+    <property name="uber.jar" value="${libs.dir}/${ant.project.name}~uber.jar"/>
+
     <property name="run.script" value="bin/${ant.project.name}.bat"/>
     <property name="sys.install.dir" value="/usr/local"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
 
+    <!-- It is better to put the taskdef directly here instead of using the
+         include file as the documentation suggests. The include file is
+         contained inside the jar file. So, then it is necessary to extract
+         the jar file to get to the include file. So now you need both the
+         extracted include file and the jar file, or the extracted jar
+         contents.
+         This gets messy. Just keep the jar file jarred and use the taskdef
+         here. Intellij is then able to file the classname at least, which
+         it couldn't do with everything extracted. But, it still can't
+         recognize the one-jar task...doh!
+         -->
+    <taskdef name="one-jar" classname="com.simontuffs.onejar.ant.OneJarTask"
+             classpath="${one-jar.jar}" onerror="report"/>
+
     <condition property="java.version.is.too.high">
-        <javaversion atleast="9"/>
+        <and>
+            <not>
+                <isset property="ignore.java.version"/>
+            </not>
+            <javaversion atleast="9"/>
+        </and>
     </condition>
 
+    <fileset id="dependency.jar.set" dir="${lib.dir}">
+        <include name="gson-2.4.jar"/>
+        <include name="jna-4.0.0.jar"/>
+        <include name="jna-platform-4.0.0.jar"/>
+    </fileset>
+
     <path id="dependency.jars">
-        <fileset dir="lib">
-            <include name="gson-2.4.jar"/>
-            <include name="jna-4.0.0.jar"/>
-            <include name="jna-platform-4.0.0.jar"/>
-        </fileset>
+        <fileset refid="dependency.jar.set"/>
     </path>
 
     <target name="verify-java-version" description="Java version has to be between 5 and 8"
     if="java.version.is.too.high">
         <fail>Java version is too high
 
-            The Java version running Ant is ${java.specification.version}. That is too high.
-            This application targets Java 1.5, so the Java version must not be greater than 1.8
-            because it was the last version to compile 1.5 code.
+            Ant is running on Java version ${java.specification.version}. Please set JAVA_HOME
+            to Java 1.8 or less, because that was the last version
+            to compile code for Java 1.5.
+
+            Alternatively, define the property ignore.java.version:
+
+                ant -Dignore.java.version=true jar
+
+            But, this will force your users to have at least your
+            version. It will cause failures for those who don't
+            want to, or can't upgrade. Java hatred will increase
+            in the world, and it will be your fault.
         </fail>
     </target>
 
@@ -52,25 +121,43 @@
     <target name="compile" depends="setup" description="Compiles the source">
         <javac srcdir="${src.dir}" destdir="${cls.dir}"
                debug="on" source="${lang.version}" target="${lang.version}"
-               includeAntRuntime="false" fork="yes" executable="${java.compiler}">
+               includeAntRuntime="false">
             <classpath refid="dependency.jars"/>
         </javac>
     </target>
 
     <target name="jar" depends="compile" description="Builds an executable jar file">
-        <unzip dest="${cls.dir}">
-            <path refid="dependency.jars"/>
-        </unzip>
-        <jar destfile="${app.jar}">
+        <manifestclasspath property="jar.runtime.classpath" jarfile="${jar}">
+            <classpath refid="dependency.jars"/>
+        </manifestclasspath>
+        <jar destfile="${jar}">
             <manifest>
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Implementation-Vendor" value="${vendor}"/>
                 <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Class-Path" value="${jar.runtime.classpath}"/>
             </manifest>
             <fileset dir="${cls.dir}"/>
-            <fileset dir="${src.dir}"/>
+<!--            <fileset dir="${src.dir}"/>-->
         </jar>
+    </target>
+
+    <target name="uber-jar" depends="compile" description="Builds an executable/fat/uber jar file">
+        <one-jar destfile="${uber.jar}">
+            <manifest>
+                <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Vendor" value="${vendor}"/>
+                <attribute name="One-Jar-Main-Class" value="${main.class}"/>
+            </manifest>
+            <main>
+                <fileset dir="${cls.dir}"/>
+            </main>
+            <lib>
+                <fileset refid="dependency.jar.set"/>
+            </lib>
+        </one-jar>
     </target>
 
     <target name="user-install" depends="jar" description="Installs into $HOME/bin and $HOME/lib">
@@ -78,7 +165,7 @@
         <copy file="${run.script}" todir="${user.home}/bin" preservelastmodified="true"/>
         <chmod file="${user.home}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${user.home}/lib"/>
-        <copy file="${app.jar}" todir="${user.home}/lib" preservelastmodified="true"/>
+        <copy file="${jar}" todir="${user.home}/lib" preservelastmodified="true"/>
         <exec dir="${user.home}/bin" executable="cmd.exe" osfamily="windows">
             <arg line="bin/addtopath.bat"/>
         </exec>
@@ -89,7 +176,7 @@
         <copy file="${run.script}" todir="${sys.install.dir}/bin" preservelastmodified="true"/>
         <chmod file="${sys.install.dir}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${sys.install.dir}/lib"/>
-        <copy file="${app.jar}" todir="${sys.install.dir}/lib" preservelastmodified="true"/>
+        <copy file="${jar}" todir="${sys.install.dir}/lib" preservelastmodified="true"/>
     </target>
 
     <target name="dist-zip" depends="jar" description="Build a zip file with just binaries for distribution to users">
@@ -103,14 +190,14 @@
     </target>
 
     <target name="run" depends="jar" description="Run Jar file">
-        <java jar="${app.jar}" fork="true"/>
+        <java jar="${jar}" fork="true"/>
     </target>
 
     <target name="wine" depends="jar" description="Run Jar file with Wine">
-        <exec executable="wine">
-            <arg value="C:\Program Files (x86)\Java\jdk8u452-b09\bin\java.exe"/>
+        <exec executable="wineconsole">
+            <arg value="java"/>
             <arg value="-jar"/>
-            <arg value="${app.jar}"/>
+            <arg value="${jar}"/>
         </exec>
     </target>
 
@@ -118,7 +205,7 @@
         <exec executable="wineconsole" spawn="true">
             <arg value="jdb"/>
             <arg value="-classpath"/>
-            <arg value="${app.jar}"/>
+            <arg value="${jar}"/>
             <arg value="-sourcepath"/>
             <arg value="${src.dir}"/>
         </exec>
