@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="build/libs/wallpaper-switcher~autonomous.jar"/>
+	<classpathentry kind="lib" path="build/libs/wallpaper-switcher~uber.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jna-4.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/jna-platform-4.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/one-jar-ant-task-0.97.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

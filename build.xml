@@ -18,6 +18,10 @@
     <property name="build.dir" value="build"/>
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
+    <property name="run.script" value="bin/${ant.project.name}.bat"/>
+    <property name="sys.install.dir" value="/usr/local"/>
+    <property name="bld.dist.dir" value="${build.dir}/distribution"/>
+    <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
 
     <!-- The following naming proposal should only affect executable jars, not
          regular library jars. It is to differentiate between a self-contained
@@ -56,10 +60,6 @@
                                                       jars outside itself
              -->
     <property name="uber.jar" value="${libs.dir}/${ant.project.name}~uber.jar"/>
-
-    <property name="run.script" value="bin/${ant.project.name}.bat"/>
-    <property name="sys.install.dir" value="/usr/local"/>
-    <property name="bld.dist.dir" value="${build.dir}/distribution"/>
 
     <!-- It is better to put the taskdef directly here instead of using the
          include file as the documentation suggests. The include file is
@@ -160,12 +160,12 @@
         </one-jar>
     </target>
 
-    <target name="user-install" depends="jar" description="Installs into $HOME/bin and $HOME/lib">
+    <target name="user-install" depends="uber-jar" description="Installs into $HOME/bin and $HOME/lib">
         <mkdir dir="${user.home}/bin"/>
         <copy file="${run.script}" todir="${user.home}/bin" preservelastmodified="true"/>
         <chmod file="${user.home}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${user.home}/lib"/>
-        <copy file="${jar}" todir="${user.home}/lib" preservelastmodified="true"/>
+        <copy file="${uber.jar}" todir="${user.home}/lib" preservelastmodified="true"/>
         <exec dir="${user.home}/bin" executable="cmd.exe" osfamily="windows">
             <arg line="bin/addtopath.bat"/>
         </exec>
