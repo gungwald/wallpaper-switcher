@@ -4,3 +4,5 @@
 classes/
 out/
 build/
+# Vim backup files
+.*.swp

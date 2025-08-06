@@ -4,6 +4,8 @@ setlocal EnableDelayedExpansion
 
 set COMMAND_NOT_FOUND=9009
 set JAVA=java
+set JAR=%~dp0..\lib\wallpaper-switcher~uber.jar
+
 if defined JAVA_HOME (
     if exist "%JAVA_HOME%"\bin\java.exe (
         set JAVA=%JAVA_HOME%\bin\java.exe
@@ -13,12 +15,7 @@ if defined JAVA_HOME (
     )
 )
 
-set JAVA=BLAH
-"%JAVA%" -jar %~dp0..\lib\wallpaper-switcher~runnable.jar %*
-
-echo.
-echo.
-echo ERROR: %JAVA% was not found.
+"%JAVA%" -jar "%JAR%" %*
 
 :LOOP
 
@@ -74,7 +71,7 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
             echo before choice, opts=!opts!
             echo javaInstances[0]=!javaInstances[0]!
             choice /c "!opts!" /m "Which one"
-            "!javaInstances[!ERRORLEVEL!]!" -jar  %~dp0..\lib\wallpaper-switcher~runnable.jar %*
+            "!javaInstances[!ERRORLEVEL!]!" -jar "%JAR%" %*
         )
     )
 )

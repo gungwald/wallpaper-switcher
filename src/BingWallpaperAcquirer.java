@@ -26,22 +26,25 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
 
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
-        logger.info("Reading Bing wallpaper metadata from: " + info.toString());
+	System.out.println("Getting today's wallpaper URL...");
+        logger.fine("Reading Bing wallpaper metadata from: " + info.toString());
         String jsonText = readAllChars(info);
-        logger.info("Read info: " + jsonText);
+        logger.fine("Read info: " + jsonText);
         JsonObject json = new Gson().fromJson(jsonText, JsonObject.class);
-        logger.info("JSON object: " + jsonText);
+        logger.fine("JSON object: " + jsonText);
         JsonObject firstImage = json.get("images").getAsJsonArray().get(0).getAsJsonObject();
         String path = firstImage.get("url").getAsString();
         String wallpaperUrlText = "http://bing.com" + path;
-        logger.info("images[0].url: " + jsonText);
+        logger.fine("images[0].url: " + jsonText);
         URL wallpaperUrl = new URL(wallpaperUrlText);
-        byte[] wallpaper = readAllBytes(wallpaperUrl);
-        logger.info("Reading wallpaper from " + wallpaperUrl.toString());
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
+	System.out.printf("Downloading %s%n...", localFileName);
+        logger.fine("Reading wallpaper from " + wallpaperUrl.toString());
+        byte[] wallpaper = readAllBytes(wallpaperUrl);
         mkdir(wallpaperDir);
         File localFile = new File(wallpaperDir, localFileName);
-        logger.info("Writing wallpaper to " + localFile.getName());
+        logger.fine("Saving to " + localFile.getCanonicalPath());
+        logger.fine("Writing wallpaper to " + localFile.getCanonicalPath());
         writeAll(localFile, wallpaper);
         return localFile;
     }

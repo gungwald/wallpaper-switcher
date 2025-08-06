@@ -143,7 +143,8 @@
         </jar>
     </target>
 
-    <target name="uber-jar" depends="compile" description="Builds an executable/fat/uber jar file">
+    <target name="uber-jar" depends="compile" 
+            description="Builds an executable/fat/uber jar file">
         <one-jar destfile="${uber.jar}">
             <manifest>
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
@@ -160,12 +161,15 @@
         </one-jar>
     </target>
 
-    <target name="user-install" depends="uber-jar" description="Installs into $HOME/bin and $HOME/lib">
+    <target name="user-install" depends="uber-jar" 
+            description="Installs into $HOME/bin and $HOME/lib">
         <mkdir dir="${user.home}/bin"/>
-        <copy file="${run.script}" todir="${user.home}/bin" preservelastmodified="true"/>
+	<copy file="${run.script}" todir="${user.home}/bin" 
+	      preservelastmodified="true"/>
         <chmod file="${user.home}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${user.home}/lib"/>
-        <copy file="${uber.jar}" todir="${user.home}/lib" preservelastmodified="true"/>
+	<copy file="${uber.jar}" todir="${user.home}/lib" 
+              preservelastmodified="true"/>
         <exec dir="${user.home}/bin" executable="cmd.exe" osfamily="windows">
             <arg line="bin/addtopath.bat"/>
         </exec>
