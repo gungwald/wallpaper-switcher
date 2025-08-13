@@ -71,7 +71,7 @@ public class Wallpaper {
      * <a href="https://learn.microsoft.com/en-us/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.
      */
     @SuppressWarnings("SpellCheckingInspection")
-    protected static native boolean SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
+    protected static native UINT SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
 
     public Wallpaper() {
     }
@@ -86,16 +86,16 @@ public class Wallpaper {
         // Set it in the registry
         Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", wallpaper.getAbsolutePath());
         // And also call the normal function. It is necessary to do both for some reason.
-        boolean success =
+        UINT success =
                 SystemParametersInfo(
                         new UINT(SPI_SETDESKWALLPAPER),
                         new UINT(0),
                         wallpaper.getAbsolutePath(),
                         new UINT(SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
                 );
-
-        logger.log(Level.INFO, "Last error: " + String.valueOf(Kernel32.INSTANCE.GetLastError()));
-        if (! success) {
+        logger.log(Level.INFO, "Result: " + String.valueOf(success));
+        if (success != (new UINT(0))) {
+            logger.log(Level.SEVERE, "Last error: " + String.valueOf(Kernel32.INSTANCE.GetLastError()));
             Win32Exception e = new Win32Exception(Kernel32.INSTANCE.GetLastError());
             logger.throwing(Wallpaper.class.getName(), "set", e);
             throw e;

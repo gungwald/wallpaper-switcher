@@ -26,8 +26,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
 
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
-	System.out.println("Getting today's wallpaper URL...");
-	System.out.flush();
+        println("Getting today's wallpaper URL...");
         logger.fine("Reading Bing wallpaper metadata from: " + info.toString());
         String jsonText = readAllChars(info);
         logger.fine("Read info: " + jsonText);
@@ -39,16 +38,14 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         logger.fine("images[0].url: " + jsonText);
         URL wallpaperUrl = new URL(wallpaperUrlText);
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
-	System.out.printf("Downloading %s%n...", localFileName);
-	System.out.flush();
+        printf("Downloading %s%n...", localFileName);
         logger.fine("Reading wallpaper from " + wallpaperUrl.toString());
         byte[] wallpaper = readAllBytes(wallpaperUrl);
         mkdir(wallpaperDir);
         File localFile = new File(wallpaperDir, localFileName);
         logger.fine("Saving to " + localFile.getCanonicalPath());
         logger.fine("Writing wallpaper to " + localFile.getCanonicalPath());
-	System.out.printf("Saving %s%n...", localFileName);
-	System.out.flush();
+        printf("Saving %s%n...", localFileName);
         writeAll(localFile, wallpaper);
         return localFile;
     }
@@ -109,6 +106,16 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         } finally {
             close(out, f);
         }
+    }
+
+    public void printf(String message, Object... params) {
+        System.out.printf(message, params);
+        System.out.flush();
+    }
+
+    public void println(String message) {
+        System.out.println(message);
+        System.out.flush();
     }
 
     protected void close(FileOutputStream out, File f) {
