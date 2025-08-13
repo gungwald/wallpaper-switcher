@@ -27,12 +27,12 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
     echo Wallpaper Switcher requires Java, but it was not found. How would you like to
     echo resolve this?
     echo.
-    echo 1. Search your local drives for Java.
-    echo 2. Download and install Java.
-    echo 3. Give up and quit like a loser.
+    echo 1. Search your local drives for Java
+    echo 2. Download and install Java
+    echo 3. Give up and quit like a loser
     echo.
     choice /c 123 /m "Choose wisely"
-    if "!ERRORLEVEL!"=="1" (
+    if !ERRORLEVEL! EQU 1 (
         set startDir=C:\
         echo Searching for Java from directory !startDir!...
         rem This "pushd" makes it work in Wine's cmd.exe
@@ -87,8 +87,13 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
     )
 )
 
+echo %CMDCMDCOMMAND%
+if exist WINEHOMEDIR pause
+
+
 endlocal
 
 goto :EOF
 
-echo https://learn.microsoft.com/en-us/java/openjdk/download
+        start "" /b /ProgIDOpen htmlfile https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi
+        echo      https://learn.microsoft.com/en-us/java/openjdk/download

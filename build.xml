@@ -205,7 +205,8 @@
         </exec>
     </target>
 
-    <target name="wine-debug" depends="jar" description="Debug Jar file with Wine">
+    <target name="wine-debug" depends="jar" 
+            description="Debug Jar file with Wine">
         <exec executable="wineconsole" spawn="true">
             <arg value="jdb"/>
             <arg value="-classpath"/>
