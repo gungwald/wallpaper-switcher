@@ -202,20 +202,32 @@
              not necessary to find the jar, or java, or download java.
              Those are user conveniences. The jar that was just built is
              the one that needs tested. Don't call to a batch file that
-             might choose a different one.
+             might choose a different one. Create minimal batch file with
+             a pause command to make sure the output can be read before
+             the window disappears.
+             -->
+        <echo file="${build.dir}/debug.bat">@echo off
+            java -jar ${uber.jar}
+            pause
+        </echo>
+        <!-- This may require "winetricks cmd" to be installed for the
+             /c switch to work. And then it gets installed in
+             C:\windows\syswow64 which may not be first in the path and
+             the default cmd may not work. So check that if this fails.
+             OMG, Wine is hard to get to work.
+
+             The 32-bit Java 8 works in Wine. The latest 64-bit version
+             did not work. It exited with an internal error.
              -->
         <exec executable="wineconsole">
-            <arg value="java"/>
-            <arg value="-Dpause.at.end=true"/>
-            <arg value="-jar"/>
-            <arg value="${uber.jar}"/>
+            <arg value="cmd"/>
+            <arg value="/c"/>
+            <arg value="${build.dir}\debug.bat"/>
         </exec>
     </target>
 
-    <target name="wine-debug" depends="jar" 
-            description="Debug Jar file with Wine">
+    <target name="wine-debug" depends="jar" description="Debug Jar file with Wine">
         <exec executable="wineconsole" spawn="true">
-            <env key="PAUSE_AT_END" value="true"/>
             <arg value="jdb"/>
             <arg value="-classpath"/>
             <arg value="${jar}"/>

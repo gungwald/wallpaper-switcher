@@ -6,3 +6,5 @@ out/
 build/
 # Vim backup files
 .*.swp
+# Java dump files
+hs_err_pid*.log
