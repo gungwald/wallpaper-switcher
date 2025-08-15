@@ -19,7 +19,7 @@ if defined JAVA_HOME (
 
 :LOOP
 
-if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
+if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
     echo.
     echo.
     echo ******************************* ACTION REQUIRED *******************************
@@ -32,7 +32,14 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
     echo 3. Give up and quit like a loser
     echo.
     choice /c 123 /m "Choose wisely"
-    if !ERRORLEVEL! EQU 1 (
+    echo after
+    echo ERRORLEVEL=!ERRORLEVEL!
+    if "!ERRORLEVEL!"=="" (
+        echo ERRORLEVEL was not set. Cannot continue.
+        goto :DONE
+    )
+    echo after2
+    if "!ERRORLEVEL!"=="1" (
         set startDir=C:\
         echo Searching for Java from directory !startDir!...
         rem This "pushd" makes it work in Wine's cmd.exe
@@ -50,7 +57,7 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
             )
         )
         popd
-        if !count! EQU 0 (
+        if "!count!"=="0" (
             choice /m "Java was not found. Do you want to download and install it"
             if !ERRORLEVEL! EQU 1 (
                 goto :DOWNLOAD_AND_INSTALL
@@ -74,24 +81,31 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
             "!javaInstances[!ERRORLEVEL!]!" -jar "%JAR%" %*
         )
     ) else (
+        echo In else
         if "!ERRORLEVEL!"=="2" (
             rem This is the main page for JDK downloads from Microsoft:
             rem https://learn.microsoft.com/en-us/java/openjdk/download
+            set cscript=C:\windows\syswow64\cscript.exe
+            if not exist !cscript! set cscript=cscript
             if "%PROCESSOR_ARCHITECTURE%"=="x86" (
-                cscript /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
+                "!cscript!" /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
                 rem
                 rem The below should invoke the default browser to download the file,
                 rem but it doesn't work in wine of course.
                 rem start "" /b /ProgIDOpen htmlfile https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi
             ) else (
-                cscript /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
+                "!cscript!" /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
             )
             rem echo Installing...
             rem ms-jdk.msi
         )
     )
+    rem The last paren is problematic, probably because the code block is too
+    rem long.
+    goto :DONE
 )
 
+:DONE
 if "%PAUSE_AT_END%"=="true" pause
 
 endlocal

@@ -198,9 +198,17 @@
     </target>
 
     <target name="wine" depends="jar" description="Run Jar file with Wine">
+        <!-- Don't call the batch file. It is a user-facing script. It is
+             not necessary to find the jar, or java, or download java.
+             Those are user conveniences. The jar that was just built is
+             the one that needs tested. Don't call to a batch file that
+             might choose a different one.
+             -->
         <exec executable="wineconsole">
             <env key="PAUSE_AT_END" value="true"/>
-            <arg value="bin\wallpaper-switcher.bat"/>
+            <arg value="java"/>
+            <arg value="-jar"/>
+            <arg value="${uber.jar}"/>
         </exec>
     </target>
 
