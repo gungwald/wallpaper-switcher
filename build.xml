@@ -205,8 +205,8 @@
              might choose a different one.
              -->
         <exec executable="wineconsole">
-            <env key="PAUSE_AT_END" value="true"/>
             <arg value="java"/>
+            <arg value="-Dpause.at.end=true"/>
             <arg value="-jar"/>
             <arg value="${uber.jar}"/>
         </exec>

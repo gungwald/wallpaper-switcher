@@ -1,6 +1,8 @@
 import com.microsoft.windows.Wallpaper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -29,11 +31,13 @@ public class WallpaperSwitcher {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Caught exception in main", e);
         }
-        if (System.getProperty("pause")) {
-            int c;
-            do {
-                c = System.in.read();
-            } while (c != (int) '\n');
+        if (System.getProperty("pause.at.end") != null) {
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                String line = in.readLine();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Caught exception waiting for input", e);
+            }
         }
         LOGGER.exiting(CLASS_NAME, "main");
     }
