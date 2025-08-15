@@ -199,15 +199,15 @@
 
     <target name="wine" depends="jar" description="Run Jar file with Wine">
         <exec executable="wineconsole">
-            <arg value="java"/>
-            <arg value="-jar"/>
-            <arg value="${jar}"/>
+            <env key="PAUSE_AT_END" value="true"/>
+            <arg value="bin\wallpaper-switcher.bat"/>
         </exec>
     </target>
 
     <target name="wine-debug" depends="jar" 
             description="Debug Jar file with Wine">
         <exec executable="wineconsole" spawn="true">
+            <env key="PAUSE_AT_END" value="true"/>
             <arg value="jdb"/>
             <arg value="-classpath"/>
             <arg value="${jar}"/>

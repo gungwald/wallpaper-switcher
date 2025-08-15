@@ -26,6 +26,12 @@ public class WallpaperSwitcher {
         try {
             WallpaperSwitcher ws = new WallpaperSwitcher();
             ws.execute();
+            if (System.getenv().containsKey("PAUSE_AT_END")) {
+                int c;
+                do {
+                    c = System.in.read();
+                } while (c != (int) '\n');
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Caught exception in main", e);
         }

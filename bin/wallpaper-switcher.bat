@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 
 set COMMAND_NOT_FOUND=9009
 set JAVA=java
-set JAR=%~dp0..\lib\wallpaper-switcher~uber.jar
+set JAR=%~dp0..\build\libs\wallpaper-switcher~uber.jar
 
 if defined JAVA_HOME (
     if exist "%JAVA_HOME%"\bin\java.exe (
@@ -75,25 +75,26 @@ if %ERRORLEVEL% EQU %COMMAND_NOT_FOUND% (
         )
     ) else (
         if "!ERRORLEVEL!"=="2" (
+            rem This is the main page for JDK downloads from Microsoft:
+            rem https://learn.microsoft.com/en-us/java/openjdk/download
             if "%PROCESSOR_ARCHITECTURE%"=="x86" (
                 cscript /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
+                rem
+                rem The below should invoke the default browser to download the file,
+                rem but it doesn't work in wine of course.
                 rem start "" /b /ProgIDOpen htmlfile https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi
             ) else (
                 cscript /nologo %~dp0http-get.js https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi ms-jdk.msi
             )
-            echo Installing...
-            ms-jdk.msi
+            rem echo Installing...
+            rem ms-jdk.msi
         )
     )
 )
 
-echo %CMDCMDCOMMAND%
-if exist WINEHOMEDIR pause
-
+if "%PAUSE_AT_END%"=="true" pause
 
 endlocal
 
 goto :EOF
 
-        start "" /b /ProgIDOpen htmlfile https://aka.ms/download-jdk/microsoft-jdk-21.0.7-windows-x64.msi
-        echo      https://learn.microsoft.com/en-us/java/openjdk/download

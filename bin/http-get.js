@@ -1,10 +1,15 @@
-if (typeof WScript === 'undefined' && typeof arguments !== 'undefined') {
-    print("This is a Window Script Host script. It won't work with Java.");
-    quit();
-}
+// Downloads a file or a web page over HTTP using a GET operation
+// Not originally written by me, but I added the beginning parts and methods.
 
+// CONSTANTS
 var ADO_TYPE_BINARY = 1; // adTypeBinary
 var ADO_SAVE_CREATE_OVERWRITE = 2; // adSaveCreateOverWrite
+
+// BEGIN
+if (typeof WScript === 'undefined' && typeof arguments !== 'undefined') {
+    print("This is a Window Script Host (WSH) script. It won't work with Java's Rhino.");
+    quit();
+}
 
 var source = WScript.Arguments.Item(0);
 var target = WScript.Arguments.Item(1);
@@ -36,3 +41,7 @@ if (http.status == 200) {
 else { 
    WScript.Echo("Download failed with HTTP code: " + http.status); 
 } 
+
+function basename(url) {
+    return url.substring(url.lastIndexOf("/")+1);
+}
