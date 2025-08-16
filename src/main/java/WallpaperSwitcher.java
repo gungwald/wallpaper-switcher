@@ -31,6 +31,11 @@ public class WallpaperSwitcher {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Caught exception in main", e);
         }
+        pauseAtEnd();
+        LOGGER.exiting(CLASS_NAME, "main");
+    }
+
+    public static void pauseAtEnd() {
         if (System.getProperty("pause.at.end") != null) {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -39,7 +44,6 @@ public class WallpaperSwitcher {
                 LOGGER.log(Level.SEVERE, "Caught exception waiting for input", e);
             }
         }
-        LOGGER.exiting(CLASS_NAME, "main");
     }
 
     protected void execute() throws IOException {

@@ -38,14 +38,14 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         logger.fine("images[0].url: " + jsonText);
         URL wallpaperUrl = new URL(wallpaperUrlText);
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
-        printf("Downloading %s%n...", localFileName);
+        printf("Downloading %s...%n", localFileName);
         logger.fine("Reading wallpaper from " + wallpaperUrl.toString());
         byte[] wallpaper = readAllBytes(wallpaperUrl);
         mkdir(wallpaperDir);
         File localFile = new File(wallpaperDir, localFileName);
         logger.fine("Saving to " + localFile.getCanonicalPath());
         logger.fine("Writing wallpaper to " + localFile.getCanonicalPath());
-        printf("Saving %s%n...", localFileName);
+        printf("Saving %s...%n", localFileName);
         writeAll(localFile, wallpaper);
         return localFile;
     }

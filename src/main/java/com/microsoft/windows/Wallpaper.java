@@ -3,6 +3,7 @@ package com.microsoft.windows;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.platform.win32.*;
+import com.sun.jna.platform.win32.WinDef.BOOL;
 import com.sun.jna.platform.win32.WinDef.UINT;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -71,7 +72,13 @@ public class Wallpaper {
      * <a href="https://learn.microsoft.com/en-us/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.
      */
     @SuppressWarnings("SpellCheckingInspection")
-    protected static native UINT SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
+    public static native BOOL SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
+    public static BOOL FALSE = new BOOL(0L); // Must be a long value or it fails.
+    // BOOL TRUE = new BOOL(1) <-- Don't do this!
+    // A Win32 function can return any non-zero value for TRUE so it is not
+    // safe to check a return value against a TRUE value defined to be 1.
+    // FALSE is the only dependable value. Check equals to FALSE or not
+    // equals to FALSE only.
 
     public Wallpaper() {
     }
@@ -86,7 +93,7 @@ public class Wallpaper {
         // Set it in the registry
         Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", wallpaper.getAbsolutePath());
         // And also call the normal function. It is necessary to do both for some reason.
-        UINT success =
+        BOOL success =
                 SystemParametersInfo(
                         new UINT(SPI_SETDESKWALLPAPER),
                         new UINT(0),
@@ -94,7 +101,7 @@ public class Wallpaper {
                         new UINT(SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
                 );
         logger.log(Level.INFO, "Result: " + String.valueOf(success));
-        if (success != (new UINT(0))) {
+        if (success.equals(FALSE)) {
             logger.log(Level.SEVERE, "Last error: " + String.valueOf(Kernel32.INSTANCE.GetLastError()));
             Win32Exception e = new Win32Exception(Kernel32.INSTANCE.GetLastError());
             logger.throwing(Wallpaper.class.getName(), "set", e);

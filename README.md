@@ -1,20 +1,20 @@
-WallpaperSwitcher
+# WallpaperSwitcher
 Bill Chatfield <bill_chatfield@yahoo.com>
-Distributed under the GPL
+Distributed under the GPL3
 
 
 
-DESCRIPTION
+## DESCRIPTION
 
 This program will cycle through all your images in your Pictures or My Pictures
 folder and display each of them as your desktop background for 5 minutes.
 
-Unfortunatly, .png files do not work currently.
+Unfortunately, png files do not work currently. I think these work now.
 
 
 
 
-SYSTEM REQUIREMENTS
+## SYSTEM REQUIREMENTS
 
 1. Windows XP or above is required. Sorry this software is specific to 
    Windows, but that is the inherent nature of background images. I want to 
@@ -25,21 +25,21 @@ SYSTEM REQUIREMENTS
    
 2. Java 1.6 or above is required. You can check your version of Java by 
    opening a Command Prompt and typing "java -version":
-   
-   Detailed directions:
-        1. Hold down the Windows Key and press "R".
-        2. Type "cmd" and hit the [Enter] key.
-        3. Type "java -version" and hit the [Enter] key.
+   1. Hold down the Windows Key and press "R".
+   2. Type "cmd" and hit the [Enter] key.
+   3. Type "java -version" and hit the [Enter] key.
         
    Output looks similar to this, with the version in the first line:
+   ```` 
         java version "1.7.0_45"
         Java(TM) SE Runtime Environment (build 1.7.0_45-b18)
         Java HotSpot(TM) 64-Bit Server VM (build 24.45-b08, mixed mode)
+   ````
    
 
 
 
-RECOMMENDED SOFTWARE
+## RECOMMENDED SOFTWARE
 
 1. The latest version of Java is highly recommended for the best performance
    and security. As of January 13, 2014 the latest version of Java is 1.7.0_45.
@@ -67,7 +67,7 @@ RECOMMENDED SOFTWARE
    
 
 
-WALLPAPER SWITCHER INSTALL INSTRUCTIONS
+## WALLPAPER SWITCHER INSTALL INSTRUCTIONS
 
 1. Download the WallpaperSwitcher.zip file.
 
@@ -82,7 +82,7 @@ WALLPAPER SWITCHER INSTALL INSTRUCTIONS
    
   
   
-RUN INSTRUCTIONS
+## RUN INSTRUCTIONS
 
 1. If you created the shortcut in #3 above, just double-click the shortcut.
 

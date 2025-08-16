@@ -10,16 +10,16 @@
     <property name="main.class" value="WallpaperSwitcher"/>
     <property name="vendor" value="Altered Mechanism"/>
     <property name="version" value="2.0.0"/>
-    <property name="lang.version" value="1.5"/>
-    <property name="src.dir" value="src"/>
+    <property name="lang.version" value="1.6"/> <!-- JNA requires Java 6 -->
+    <property name="src.dir" value="src/main/java"/>
     <property name="lib.dir" value="lib"/>
     <property name="one-jar.jar" value="${lib.dir}/one-jar-ant-task-0.97.jar"/>
    	<property name="java.compiler" value="${java.home}/../bin/javac" />
     <property name="build.dir" value="build"/>
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
-    <property name="run.script" value="bin/${ant.project.name}.bat"/>
-    <property name="sys.install.dir" value="/usr/local"/>
+    <property name="run.script" value="src/periphery/scripts/${ant.project.name}.bat"/>
+    <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
 
@@ -94,13 +94,14 @@
         <fileset refid="dependency.jar.set"/>
     </path>
 
-    <target name="verify-java-version" description="Java version has to be between 5 and 8"
-    if="java.version.is.too.high">
+    <target name="verify-java-version"
+            description="Java version has to be between 6 and 8"
+            if="java.version.is.too.high">
         <fail>Java version is too high
 
             Ant is running on Java version ${java.specification.version}. Please set JAVA_HOME
             to Java 1.8 or less, because that was the last version
-            to compile code for Java 1.5.
+            to compile code for Java 1.6. JNA requires version 1.6.
 
             Alternatively, define the property ignore.java.version:
 
@@ -143,7 +144,7 @@
         </jar>
     </target>
 
-    <target name="uber-jar" depends="compile" 
+    <target name="uber-jar" depends="compile"
             description="Builds an executable/fat/uber jar file">
         <one-jar destfile="${uber.jar}">
             <manifest>
@@ -161,14 +162,14 @@
         </one-jar>
     </target>
 
-    <target name="user-install" depends="uber-jar" 
+    <target name="user-install" depends="uber-jar"
             description="Installs into $HOME/bin and $HOME/lib">
         <mkdir dir="${user.home}/bin"/>
-	<copy file="${run.script}" todir="${user.home}/bin" 
-	      preservelastmodified="true"/>
+	    <copy file="${run.script}" todir="${user.home}/bin"
+	          preservelastmodified="true"/>
         <chmod file="${user.home}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${user.home}/lib"/>
-	<copy file="${uber.jar}" todir="${user.home}/lib" 
+	    <copy file="${uber.jar}" todir="${user.home}/lib"
               preservelastmodified="true"/>
         <exec dir="${user.home}/bin" executable="cmd.exe" osfamily="windows">
             <arg line="bin/addtopath.bat"/>
@@ -197,7 +198,7 @@
         <java jar="${jar}" fork="true"/>
     </target>
 
-    <target name="wine" depends="jar" description="Run Jar file with Wine">
+    <target name="wine" depends="jar,uber-jar" description="Run Jar file with Wine">
         <!-- Don't call the batch file. It is a user-facing script. It is
              not necessary to find the jar, or java, or download java.
              Those are user conveniences. The jar that was just built is
@@ -226,7 +227,7 @@
         </exec>
     </target>
 
-    <target name="wine-debug" depends="jar" description="Debug Jar file with Wine">
+    <target name="wine-debug" depends="jar,uber-jar" description="Debug Jar file with Wine">
         <exec executable="wineconsole" spawn="true">
             <arg value="jdb"/>
             <arg value="-classpath"/>
