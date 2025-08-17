@@ -1,12 +1,9 @@
-import com.microsoft.windows.Wallpaper;
+package com.alteredmechanism.wallpaperswitcher;
+
+import com.alteredmechanism.microsoft.windows.Wallpaper;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Shell32;
-import com.sun.jna.platform.win32.ShlObj;
-import com.sun.jna.platform.win32.Win32Exception;
-import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.platform.win32.WinError;
-import com.sun.jna.platform.win32.WinNT;
+import com.sun.jna.platform.win32.*;
 
 import java.io.File;
 

@@ -1,6 +1,7 @@
+package com.alteredmechanism.wallpaperswitcher;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 public interface PictureAcquirer {
     /**

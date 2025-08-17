@@ -1,4 +1,4 @@
-# WallpaperSwitcher
+# com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher
 Bill Chatfield <bill_chatfield@yahoo.com>
 Distributed under the GPL3
 
@@ -44,7 +44,7 @@ Unfortunately, png files do not work currently. I think these work now.
 1. The latest version of Java is highly recommended for the best performance
    and security. As of January 13, 2014 the latest version of Java is 1.7.0_45.
    There are no security issues with WallpaperSwitch. But there are with the
-   Java web browser plugin which is not related to WallpaperSwitcher at all.
+   Java web browser plugin which is not related to com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher at all.
    
    If you go to web sites that use Java applets (note that this is completely
    different from JavaScript as almost all web sites use JavaScript) you
@@ -69,13 +69,13 @@ Unfortunately, png files do not work currently. I think these work now.
 
 ## WALLPAPER SWITCHER INSTALL INSTRUCTIONS
 
-1. Download the WallpaperSwitcher.zip file.
+1. Download the com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.zip file.
 
-2. Unzip WallpaperSwitcher.zip to a folder of your choosing, for example:
+2. Unzip com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.zip to a folder of your choosing, for example:
    C:\Program Files
    
-3. Optionally create a desktop shortcut to WallpaperSwitcher.bat: Right-click 
-   on WallpaperSwitcher.bat and select Send to -> Desktop.
+3. Optionally create a desktop shortcut to com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat: Right-click 
+   on com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat and select Send to -> Desktop.
    
    You can give the shortcut the name "Wallpaper Switcher".
    
@@ -87,7 +87,7 @@ Unfortunately, png files do not work currently. I think these work now.
 1. If you created the shortcut in #3 above, just double-click the shortcut.
 
 2. If not, then double-click 
-   C:\Program Files\WallpaperSwitcher\bin\WallpaperSwitcher.bat.
+   C:\Program Files\com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher\bin\com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat.
    
    Replace C:\Program Files above with the folder you unzipped it to if
    you did not unzip it to C:\Program Files.

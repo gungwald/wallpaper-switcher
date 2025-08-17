@@ -7,7 +7,7 @@
 
 <project name="wallpaper-switcher" default="jar" basedir=".">
 
-    <property name="main.class" value="WallpaperSwitcher"/>
+    <property name="main.class" value="com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher"/>
     <property name="vendor" value="Altered Mechanism"/>
     <property name="version" value="2.0.0"/>
     <property name="lang.version" value="1.6"/> <!-- JNA requires Java 6 -->
@@ -119,12 +119,27 @@
         <mkdir dir="${libs.dir}"/>
     </target>
 
-    <target name="compile" depends="setup" description="Compiles the source">
+    <target name="compile-with-runtime-version" if="ignore.java.version"
+            description="Compiles with the version of the runtime JDK">
         <javac srcdir="${src.dir}" destdir="${cls.dir}"
-               debug="on" source="${lang.version}" target="${lang.version}"
+               debug="on" includeAntRuntime="false">
+            <classpath refid="dependency.jars"/>
+        </javac>
+    </target>
+
+    <target name="compile-with-specified-version" unless="ignore.java.version"
+            description="Compiles for the Java version specified in 'lang.version'">
+        <javac srcdir="${src.dir}" destdir="${cls.dir}"
+               debug="on"
+               source="${lang.version}" target="${lang.version}"
                includeAntRuntime="false">
             <classpath refid="dependency.jars"/>
         </javac>
+    </target>
+
+    <target name="compile"
+            depends="setup,compile-with-runtime-version,compile-with-specified-version"
+            description="Compiles the source">
     </target>
 
     <target name="jar" depends="compile" description="Builds an executable jar file">

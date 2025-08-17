@@ -1,4 +1,6 @@
-import com.microsoft.windows.Wallpaper;
+package com.alteredmechanism.wallpaperswitcher;
+
+import com.alteredmechanism.microsoft.windows.Wallpaper;
 
 import java.io.BufferedReader;
 import java.io.IOException;

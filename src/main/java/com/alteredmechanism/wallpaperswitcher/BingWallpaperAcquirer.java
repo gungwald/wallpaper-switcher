@@ -1,3 +1,5 @@
+package com.alteredmechanism.wallpaperswitcher;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
