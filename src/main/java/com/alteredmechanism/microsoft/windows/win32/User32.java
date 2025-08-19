@@ -4,6 +4,7 @@ import com.sun.jna.Native;
 import com.sun.jna.platform.win32.WinDef.UINT;
 import com.sun.jna.win32.StdCallLibrary;
 import com.sun.jna.win32.W32APIFunctionMapper;
+import com.sun.jna.win32.W32APIOptions;
 import com.sun.jna.win32.W32APITypeMapper;
 
 import java.util.HashMap;
@@ -11,11 +12,20 @@ import java.util.Map;
 
 @SuppressWarnings("SpellCheckingInspection")
 public interface User32 extends StdCallLibrary {
-    Map<Object,Object> opt = Map.of(
-            "type-mapper", W32APITypeMapper.UNICODE,
-            "function-mapper", W32APIFunctionMapper.UNICODE
-    );
-    User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class, Map.of());
+
+    /**
+     * Set system parameter "w32.ascii" to "true" to get ASCII functions instead of UNICODE.
+     * See the code for W32APIOptions.DEFAULT_OPTIONS.
+     */
+    Map<Object,Object> opt = new HashMap<Object,Object>(W32APIOptions.DEFAULT_OPTIONS) {{
+        // An example of how to add more options because this is really hard to figure out. I suggest leaving
+        // this here for that reason.
+        put("additional.key", "additional.value");
+    }};
+
+    /** Loads the user32.dll into this class. */
+    User32 INSTANCE = (User32) Native.loadLibrary(
+            "user32", User32.class, opt);
 
     // All variables are implicitly public, static and final in an interface.
 

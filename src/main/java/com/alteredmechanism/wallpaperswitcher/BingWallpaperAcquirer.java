@@ -28,7 +28,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
 
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
-        println("Getting today's wallpaper URL...");
+        println("Getting URL of today's wallpaper...");
         logger.fine("Reading Bing wallpaper metadata from: " + info.toString());
         String jsonText = readAllChars(info);
         logger.fine("Read info: " + jsonText);
@@ -47,7 +47,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         File localFile = new File(wallpaperDir, localFileName);
         logger.fine("Saving to " + localFile.getCanonicalPath());
         logger.fine("Writing wallpaper to " + localFile.getCanonicalPath());
-        printf("Saving %s...%n", localFileName);
+        printf("Saving in directory %s...%n", wallpaperDir.getCanonicalPath());
         writeAll(localFile, wallpaper);
         return localFile;
     }
