@@ -1,24 +1,25 @@
-# com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher
-Bill Chatfield <bill_chatfield@yahoo.com>
-Distributed under the GPL3
+# Wallpaper Switcher
 
+This program downloads the Bing wallpaper of the day and installs it as 
+the desktop background. 
 
+It is also stored in
+C:\Users\\<your-account>\Pictures\Wallpaper Switcher,
+in case you want to use it later. But, these pictures are only copyrighted
+for use as your desktop background/wallpaper. You can't use them for anything
+else.
 
-## DESCRIPTION
+# License
+Wallpaper Switcher is free and open source software, distributed under 
+the [GPL3](LICENSE). This protects the rights of the users and the 
+developers.
 
-This program will cycle through all your images in your Pictures or My Pictures
-folder and display each of them as your desktop background for 5 minutes.
+# System Requirements
 
-Unfortunately, png files do not work currently. I think these work now.
-
-
-
-
-## SYSTEM REQUIREMENTS
-
-1. Windows XP or above is required. Sorry this software is specific to 
-   Windows, but that is the inherent nature of background images. I want to 
-   eventually make it work on other platforms.
+1. Windows XP or above is required. 
+   I want to eventually make it work on other operating systems, but 
+   each operating system has its own way of installing desktop
+   wallpapers/backgrounds, so they each require special code.
    
    It might work on Windows operating systems prior to Windows XP
    but I cannot test those.
@@ -31,64 +32,58 @@ Unfortunately, png files do not work currently. I think these work now.
         
    Output looks similar to this, with the version in the first line:
    ```` 
-        java version "1.7.0_45"
-        Java(TM) SE Runtime Environment (build 1.7.0_45-b18)
-        Java HotSpot(TM) 64-Bit Server VM (build 24.45-b08, mixed mode)
+   java version "1.7.0_45"
+   Java(TM) SE Runtime Environment (build 1.7.0_45-b18)
+   Java HotSpot(TM) 64-Bit Server VM (build 24.45-b08, mixed mode)
    ````
-   
 
+# Recommend Software
 
+If you have a supported version of Windows (Windows 10 or 11 as of the time of
+this writing), then
+the latest version of Java is recommended. It can be downloaded from 
+[Microsoft](https://learn.microsoft.com/en-us/java/openjdk/download)
+for Windows on Intel/AMD or ARM.
 
-## RECOMMENDED SOFTWARE
+If you have an older version of Windows, the latest version of Java may not work.
+Wallpaper Switcher will still work with Java versions all the way back to 1.6.
 
-1. The latest version of Java is highly recommended for the best performance
-   and security. As of January 13, 2014 the latest version of Java is 1.7.0_45.
-   There are no security issues with WallpaperSwitch. But there are with the
-   Java web browser plugin which is not related to com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher at all.
-   
-   If you go to web sites that use Java applets (note that this is completely
-   different from JavaScript as almost all web sites use JavaScript) you
-   should make sure you have the latest version of Java to prevent a hacker
-   from accessing your computer.
-   
-   Download Java from java.com, but be sure to uncheck the checkbox for
-   the Ask Toolbar during the install because I'm sure you don't want that. 
-   
-2. I suggest installing my tool which prevents Java from installing unwanted 
-   software like the Ask Toolbar:
-   
-   https://sourceforge.net/projects/excludeaskfromjavainstalls/files/?source=navbar
-   
-3. If you've already accidentally installed the Ask Toolbar or other similar
-   unwanted software, there is a tool called AdwCleaner to remove them:
-   
-   http://general-changelog-team.fr/en/downloads/finish/20-outils-de-xplode/2-adwcleaner
-   
-   
+# Install Instructions
 
+1. Download the wallpaper-switcher.zip file.
 
-## WALLPAPER SWITCHER INSTALL INSTRUCTIONS
-
-1. Download the com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.zip file.
-
-2. Unzip com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.zip to a folder of your choosing, for example:
-   C:\Program Files
+2. Unzip wallpaper-switcher.zip to a folder of your choosing, for example:
+   C:\Program Files or C:\Users\\<your-account>\opt. The "opt" folder name 
+   stands for "optional software."  A wallpaper-switcher subfolder
+   will automatically be created at that location for the application files.
    
-3. Optionally create a desktop shortcut to com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat: Right-click 
-   on com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat and select Send to -> Desktop.
-   
+3. Create a desktop shortcut to bin\wallpaper-switcher.bat.
+   Right-click 
+   on bin\wallpaper-switcher.bat and select Send to -> Desktop.
    You can give the shortcut the name "Wallpaper Switcher".
-   
-   
+4. (Optional) Use the Windows Scheduler to create a schedule that runs
+   bin\wallpaper-switcher.bat once a day to get the latest wallpaper.
   
-  
-## RUN INSTRUCTIONS
+# Run Instructions
+## From the Desktop
 
-1. If you created the shortcut in #3 above, just double-click the shortcut.
+- If you created the shortcut in #3 above, just double-click the shortcut.
 
-2. If not, then double-click 
-   C:\Program Files\com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher\bin\com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher.bat.
-   
+- (Optional) If not, then double-click 
+   C:\Program Files\wallpaper-switcher\bin\wallpaper-switcher.bat.
    Replace C:\Program Files above with the folder you unzipped it to if
    you did not unzip it to C:\Program Files.
+- (Optional) If Java is properly installed, you should be able to
+  double-click lib\wallpaper-switcher.jar. The bin\wallpaper-switch.bat
+  is really only a convenience file for some use-cases. The jar file
+  is the real "executable" program file.
    
+## From the Command Line
+There are multiple options:
+- cd to the wallpaper-switcher\bin folder and type .\wallpaper-switcher
+- Add the wallpaper-switcher\bin directory to your PATH. Then you can
+type wallpaper-switcher from any location to invoke wallpaper-switcher.bat
+- You can directly invoke the jar file:
+  ```
+  java -jar <path-to-install-dir>\lib\wallpaper-switcher.jar
+  ```
