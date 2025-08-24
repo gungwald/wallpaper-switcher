@@ -1,25 +1,3 @@
-@echo off
-
-setlocal EnableDelayedExpansion
-
-set COMMAND_NOT_FOUND=9009
-set JAVA=java
-set JAR=%~dp0..\build\libs\wallpaper-switcher~uber.jar
-
-if defined JAVA_HOME (
-    if exist "%JAVA_HOME%"\bin\java.exe (
-        set JAVA=%JAVA_HOME%\bin\java.exe
-        echo Using JAVA_HOME variable.
-    ) else (
-        echo JAVA_HOME references a directory with no java.exe program.
-    )
-)
-
-"%JAVA%" -jar "%JAR%" %*
-
-:LOOP
-
-if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
     echo.
     echo.
     echo ******************************* ACTION REQUIRED *******************************
@@ -103,12 +81,3 @@ if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
     rem The last paren is problematic, probably because the code block is too
     rem long.
     goto :DONE
-)
-
-:DONE
-if "%PAUSE_AT_END%"=="true" pause
-
-endlocal
-
-goto :EOF
-

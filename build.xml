@@ -5,12 +5,13 @@
 
 <!DOCTYPE project>
 
-<project name="wallpaper-switcher" default="jar" basedir=".">
+<project name="wallpaper-switcher" default="dependent-jar" basedir=".">
 
+    <property name="app.formal.name" value="Wallpaper Switcher"/>
     <property name="main.class" value="com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher"/>
     <property name="vendor" value="Altered Mechanism"/>
-    <property name="version" value="2.0.0"/>
-    <property name="lang.version" value="1.6"/> <!-- JNA requires Java 6 -->
+    <property name="targeted.github.release" value="4.0.0"/> <!-- Sync with next github release -->
+    <property name="compile.target.version" value="1.6"/> <!-- JNA requires Java 6 -->
     <property name="src.dir" value="src/main/java"/>
     <property name="lib.dir" value="lib"/>
     <property name="one-jar.jar" value="${lib.dir}/one-jar-ant-task-0.97.jar"/>
@@ -18,10 +19,19 @@
     <property name="build.dir" value="build"/>
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
-    <property name="run.script" value="src/periphery/scripts/${ant.project.name}.bat"/>
+    <property name="run.script.dir" value="src/periphery/scripts"/>
+    <property name="run.script" value="${run.script.dir}/${ant.project.name}.bat"/>
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
+
+    <!-- Might need a better location, but the file name is corrected from the Ant default.
+
+         The below task "buildnumber" automatically populates the property:
+         build.number
+         using the "build.number.file" defined here.
+         -->
+    <property name="build.number.file" value="src/build-number.txt"/>
 
     <!-- The following naming proposal should only affect executable jars, not
          regular library jars. It is to differentiate between a self-contained
@@ -45,7 +55,7 @@
              wallpaper-switcher~slim.jar            - opposite of fat
              wallpaper-switcher~simple.jar          - opposite of uber, kind of
              -->
-    <property name="jar" value="${libs.dir}/${ant.project.name}~dependent.jar"/>
+    <property name="dep-jar" value="${libs.dir}/${ant.project.name}~dependent.jar"/>
 
     <!-- A better description than "uber", or "fat" or "executable" would be
          self-contained. But it is very long. Also, "autonomous" would be good,
@@ -117,10 +127,13 @@
     <target name="setup" depends="verify-java-version" description="Sets stuff up">
         <mkdir dir="${cls.dir}"/>
         <mkdir dir="${libs.dir}"/>
+        <buildnumber file="${build.number.file}"/> <!-- Create or increment build.number. -->
     </target>
 
     <target name="compile-with-runtime-version" if="ignore.java.version"
             description="Compiles with the version of the runtime JDK">
+        <!-- Needed for manifest property -->
+        <property name="compile.target.version" value="${java.specification.version}"/>
         <javac srcdir="${src.dir}" destdir="${cls.dir}"
                debug="on" includeAntRuntime="false">
             <classpath refid="dependency.jars"/>
@@ -131,7 +144,7 @@
             description="Compiles for the Java version specified in 'lang.version'">
         <javac srcdir="${src.dir}" destdir="${cls.dir}"
                debug="on"
-               source="${lang.version}" target="${lang.version}"
+               source="${compile.target.version}" target="${compile.target.version}"
                includeAntRuntime="false">
             <classpath refid="dependency.jars"/>
         </javac>
@@ -142,20 +155,26 @@
             description="Compiles the source">
     </target>
 
-    <target name="jar" depends="compile" description="Builds an executable jar file">
-        <manifestclasspath property="jar.runtime.classpath" jarfile="${jar}">
+    <target name="dependent-jar" depends="compile" description="Builds an executable jar file">
+        <manifestclasspath property="jar.runtime.classpath" jarfile="${dep-jar}">
             <classpath refid="dependency.jars"/>
         </manifestclasspath>
-        <jar destfile="${jar}">
+        <jar destfile="${dep-jar}">
             <manifest>
+                <attribute name="Specification-Title" value="${app.formal.name}"/>
+                <attribute name="Specification-Version" value="${targeted.github.release}"/>
+                <attribute name="Specification-Vendor" value="${vendor}"/>
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
-                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Version" value="build.${build.number}"/>
                 <attribute name="Implementation-Vendor" value="${vendor}"/>
                 <attribute name="Main-Class" value="${main.class}"/>
                 <attribute name="Class-Path" value="${jar.runtime.classpath}"/>
+                <attribute name="Build-Java-Runtime-Name" value="${java.runtime.name}"/>
+                <attribute name="Build-Java-Runtime-Version" value="${java.runtime.version}"/>
+                <attribute name="Build-Java-Vendor" value="${java.vendor}"/>
+                <attribute name="Compile-Target-Version" value="${compile.target.version}"/>
             </manifest>
             <fileset dir="${cls.dir}"/>
-<!--            <fileset dir="${src.dir}"/>-->
         </jar>
     </target>
 
@@ -163,10 +182,17 @@
             description="Builds an executable/fat/uber jar file">
         <one-jar destfile="${uber.jar}">
             <manifest>
+                <attribute name="Specification-Title" value="${app.formal.name}"/>
+                <attribute name="Specification-Version" value="${targeted.github.release}"/>
+                <attribute name="Specification-Vendor" value="${vendor}"/>
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
-                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Version" value="build.${build.number}"/>
                 <attribute name="Implementation-Vendor" value="${vendor}"/>
                 <attribute name="One-Jar-Main-Class" value="${main.class}"/>
+                <attribute name="Build-Java-Runtime-Name" value="${java.runtime.name}"/>
+                <attribute name="Build-Java-Runtime-Version" value="${java.runtime.version}"/>
+                <attribute name="Build-Java-Vendor" value="${java.vendor}"/>
+                <attribute name="Compile-Target-Version" value="${compile.target.version}"/>
             </manifest>
             <main>
                 <fileset dir="${cls.dir}"/>
@@ -177,7 +203,10 @@
         </one-jar>
     </target>
 
-    <target name="user-install" depends="uber-jar"
+    <target name="jars" depends="dependent-jar,uber-jar"
+            description="Builds all jars"/>
+
+    <target name="user-install" depends="jars"
             description="Installs into $HOME/bin and $HOME/lib">
         <mkdir dir="${user.home}/bin"/>
 	    <copy file="${run.script}" todir="${user.home}/bin"
@@ -191,34 +220,36 @@
         </exec>
     </target>
 
-    <target name="system-install" depends="jar" description="Installs into /usr/local/bin and /usr/local/lib">
+    <target name="system-install" depends="jars" description="Installs into /usr/local/bin and /usr/local/lib">
         <mkdir dir="${sys.install.dir}/bin"/>
         <copy file="${run.script}" todir="${sys.install.dir}/bin" preservelastmodified="true"/>
         <chmod file="${sys.install.dir}/bin/${ant.project.name}" perm="ugo+rx"/>
         <mkdir dir="${sys.install.dir}/lib"/>
-        <copy file="${jar}" todir="${sys.install.dir}/lib" preservelastmodified="true"/>
+        <copy file="${dep-jar}" todir="${sys.install.dir}/lib" preservelastmodified="true"/>
     </target>
 
-    <target name="dist-zip" depends="jar" description="Build a zip file with just binaries for distribution to users">
+    <target name="dist-zip" depends="uber-jar" description="Build a zip file with just binaries for distribution to users">
         <mkdir dir="${bld.dist.dir}"/>
-        <move file="build/libs" tofile="build/lib"/>
-        <zip destfile="${bld.dist.dir}/${ant.project.name}-${version}-bin.zip">
-            <fileset dir="." includes="bin/*"/>
-            <fileset dir="${build.dir}" includes="lib/${ant.project.name}-${version}.jar"/>
+        <mkdir dir="${bld.dist.dir}/bin"/>
+        <mkdir dir="${bld.dist.dir}/lib"/>
+        <copy file="${run.script}" todir="${bld.dist.dir}/bin"/>
+        <copy file="src/periphery/javascript/libexec/http-get.js" todir="${bld.dist.dir}/bin"/>
+        <copy file="${uber.jar}" todir="${bld.dist.dir}/lib"/>
+        <zip destfile="${build.dir}/libs/${ant.project.name}-${targeted.github.release}-bin.zip">
+            <fileset dir="${bld.dist.dir}" includes="**/*"/>
         </zip>
-        <move file="${build.dir}/lib" tofile="build/libs"/>
     </target>
 
-    <target name="run" depends="jar" description="Run Jar file">
-        <java jar="${jar}" fork="true"/>
+    <target name="run" depends="dependent-jar" description="Run Jar file">
+        <java jar="${dep-jar}" fork="true"/>
     </target>
 
-    <target name="wine" depends="jar,uber-jar" description="Run Jar file with Wine">
+    <target name="wine" depends="dependent-jar,uber-jar" description="Run Jar file with Wine">
         <!-- Don't call the batch file. It is a user-facing script. It is
              not necessary to find the jar, or java, or download java.
              Those are user conveniences. The jar that was just built is
              the one that needs tested. Don't call to a batch file that
-             might choose a different one. Create minimal batch file with
+             might choose a different jar. Create minimal batch file with
              a pause command to make sure the output can be read before
              the window disappears.
              -->
@@ -242,11 +273,11 @@
         </exec>
     </target>
 
-    <target name="wine-debug" depends="jar,uber-jar" description="Debug Jar file with Wine">
+    <target name="wine-debug" depends="dependent-jar" description="Debug Jar file with Wine">
         <exec executable="wineconsole" spawn="true">
             <arg value="jdb"/>
             <arg value="-classpath"/>
-            <arg value="${jar}"/>
+            <arg value="${dep-jar}"/>
             <arg value="-sourcepath"/>
             <arg value="${src.dir}"/>
         </exec>
@@ -257,4 +288,3 @@
     </target>
 
 </project>
-

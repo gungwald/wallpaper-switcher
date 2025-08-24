@@ -11,8 +11,9 @@ else.
 
 # License
 Wallpaper Switcher is free and open source software, distributed under 
-the [GPL3](LICENSE). This protects the rights of the users and the 
-developers.
+the [GPLv3](LICENSE). This protects the rights of the users and the 
+developers. Here is an [explanation](https://www.gnu.org/licenses/gpl-3.0.en.html$)
+of the GPLv3.
 
 # System Requirements
 
