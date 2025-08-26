@@ -19,7 +19,7 @@
     <property name="build.dir" value="build"/>
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
-    <property name="run.script.dir" value="src/periphery/scripts"/>
+    <property name="run.script.dir" value="src/start/scripts"/>
     <property name="run.script" value="${run.script.dir}/${ant.project.name}.bat"/>
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
@@ -233,7 +233,7 @@
         <mkdir dir="${bld.dist.dir}/bin"/>
         <mkdir dir="${bld.dist.dir}/lib"/>
         <copy file="${run.script}" todir="${bld.dist.dir}/bin"/>
-        <copy file="src/periphery/javascript/libexec/http-get.js" todir="${bld.dist.dir}/bin"/>
+        <copy file="src/start/javascript/libexec/http-get.js" todir="${bld.dist.dir}/bin"/>
         <copy file="${uber.jar}" todir="${bld.dist.dir}/lib"/>
         <zip destfile="${build.dir}/libs/${ant.project.name}-${targeted.github.release}-bin.zip">
             <fileset dir="${bld.dist.dir}" includes="**/*"/>
