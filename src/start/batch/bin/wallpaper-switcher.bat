@@ -15,6 +15,7 @@ if defined JAVA_HOME (
     )
 )
 
+echo Starting...
 "%JAVA%" -jar "%JAR%" %*
 
 :LOOP

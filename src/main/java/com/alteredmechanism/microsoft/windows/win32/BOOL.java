@@ -12,6 +12,7 @@ public class BOOL implements NativeMapped
     /** 0 is false, anything else is true */
     protected int intValue;
 
+    @SuppressWarnings("unused")
     public BOOL() {
         this(0);
     }
@@ -19,6 +20,7 @@ public class BOOL implements NativeMapped
         this.intValue = intValue;
     }
 
+    @SuppressWarnings("unused")
     public BOOL(boolean b) {
         intValue = b ? TRUE.intValue : FALSE.intValue;
     }
@@ -41,24 +43,20 @@ public class BOOL implements NativeMapped
      * @param ctx Apparently worthless here
      * @return Something of type BOOL
      */
-    @Override
     public Object fromNative(Object nativeValue, FromNativeContext ctx) {
         // BOOL is based on an int.
         int primitiveValue = nativeValue==null ? FALSE.intValue : (Integer) nativeValue;
         return new BOOL(primitiveValue);
     }
 
-    @Override
     public Object toNative() {
         return intValue;
     }
 
-    @Override
-    public Class nativeType() {
+    public Class<?> nativeType() {
         return ((Object) intValue).getClass();
     }
 
-    @Override
     public boolean equals(Object other) {
         if (other instanceof BOOL) {
             BOOL that = (BOOL) other;
@@ -102,6 +100,6 @@ public class BOOL implements NativeMapped
     }
 
     public static boolean booleanValue(String s) {
-        return s != null && !s.isEmpty();
+        return s != null && s.trim().length() != 0;
     }
 }

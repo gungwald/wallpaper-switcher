@@ -29,20 +29,42 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
         println("Getting URL of today's wallpaper...");
+
+        // Read the JSON metadata from Bing
         logger.fine("Reading Bing wallpaper metadata from: " + info.toString());
         String jsonText = readAllChars(info);
         logger.fine("Read info: " + jsonText);
+
+        // Parse the JSON
         JsonObject json = new Gson().fromJson(jsonText, JsonObject.class);
         logger.fine("JSON object: " + jsonText);
+
+        // Get the first image from the array of images
         JsonObject firstImage = json.get("images").getAsJsonArray().get(0).getAsJsonObject();
+
+        // Extract & print information about the image
+        String title = firstImage.get("title").getAsString();
+        println("Title: " + title);
+        String copyright = firstImage.get("copyright").getAsString();
+        println("Copyright: " + copyright);
+        String copyrightLink = firstImage.get("copyrightlink").getAsString();
+        println("Link: " + copyrightLink);
+
+        // Get the URL of the image
         String path = firstImage.get("url").getAsString();
         String wallpaperUrlText = "http://bing.com" + path;
         logger.fine("images[0].url: " + jsonText);
         URL wallpaperUrl = new URL(wallpaperUrlText);
+
+        // Get the text of the local file name from the query string
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
         printf("Downloading %s...%n", localFileName);
+
+        // Download the raw bytes of the image into a byte array called wallpaper.
         logger.fine("Reading wallpaper from " + wallpaperUrl.toString());
         byte[] wallpaper = readAllBytes(wallpaperUrl);
+
+        // Save the wallpaper to the target directory
         mkdir(wallpaperDir);
         File localFile = new File(wallpaperDir, localFileName);
         logger.fine("Saving to " + localFile.getCanonicalPath());

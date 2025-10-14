@@ -60,5 +60,5 @@ public interface User32 extends StdCallLibrary {
      * @return When setting the wallpaper, this will be false if it fails or true if it succeeds. To get extended error
      *         information, call <a href="https://learn.microsoft.com/en-us/windows/desktop/api/errhandlingapi/nf-errhandlingapi-getlasterror">GetLastError</a>.
      */
-    BOOL SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
+    com.alteredmechanism.microsoft.windows.win32.BOOL SystemParametersInfo(UINT uiAction, UINT uiParam, String pvParam, UINT fWinIni);
 }

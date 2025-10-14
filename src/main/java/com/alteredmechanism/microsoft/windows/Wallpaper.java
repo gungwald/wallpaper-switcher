@@ -1,7 +1,6 @@
 package com.alteredmechanism.microsoft.windows;
 
 import com.alteredmechanism.microsoft.windows.win32.BOOL;
-import com.alteredmechanism.microsoft.windows.win32.User32;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Win32Exception;
@@ -37,15 +36,15 @@ public class Wallpaper {
         Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", wallpaper.getAbsolutePath());
         // And also call the normal function. It is necessary to do both for some reason.
         BOOL success =
-                User32.INSTANCE.SystemParametersInfo(
+                INSTANCE.SystemParametersInfo(
                         new UINT(SPI_SETDESKWALLPAPER),
                         new UINT(0),
                         wallpaper.getAbsolutePath(),
                         new UINT(SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE)
                 );
-        logger.log(Level.FINE, "Result: " + String.valueOf(success));
+        logger.log(Level.FINE, "Result: " + success);
         if (!success.booleanValue()) {
-            logger.log(Level.SEVERE, "Last error: " + String.valueOf(Kernel32.INSTANCE.GetLastError()));
+            logger.log(Level.SEVERE, "Last error: " + Kernel32.INSTANCE.GetLastError());
             Win32Exception e = new Win32Exception(Kernel32.INSTANCE.GetLastError());
             logger.throwing(Wallpaper.class.getName(), "set", e);
             throw e;
