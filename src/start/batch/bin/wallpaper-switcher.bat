@@ -1,28 +1,68 @@
 @echo off
 
+rem Some JVMs require this to allow access to native code.
+rem If your JVM does not require this, you can comment out this line.
+rem If your JVM requires other options, you can add them here.
+set JVM_OPTS=--enable-native-access=ALL-UNNAMED
+
 setlocal EnableDelayedExpansion
 
+rem Constants
 set COMMAND_NOT_FOUND=9009
-set JAVA=java
-set JAR=%~dp0..\lib\wallpaper-switcher~uber.jar
+set REQUIRED_JAVA_VERSION=11
 
+rem Check if JAVA_HOME is set and points to a valid java.exe
 if defined JAVA_HOME (
     if exist "%JAVA_HOME%"\bin\java.exe (
         set JAVA=%JAVA_HOME%\bin\java.exe
-        echo Using JAVA_HOME variable.
+        echo Using JAVA_HOME=%JAVA_HOME%.
     ) else (
         echo JAVA_HOME references a directory with no java.exe program.
+        echo Falling back to java from PATH.
+        set JAVA=java
+    )
+) else (
+    echo Using java from PATH.
+    set JAVA=java
+)
+
+rem Check if Java version is high enough to run the application.
+for /f "tokens=*" %%i in ('"%JAVA%" -version 2^>^&1 ^| findstr /i "version"') do (
+    set JAVA_VERSION_OUTPUT=%%i
+)
+for /f "tokens=2 delims==." %%a in ("%JAVA_VERSION_OUTPUT%") do (
+    set JAVA_MAJOR_VERSION=%%a
+)
+if "%JAVA_MAJOR_VERSION%" LSS "11" (
+    echo.
+    echo Wallpaper Switcher requires Java %REQUIRED_JAVA_VERSION% or higher. Detected version: %JAVA_VERSION_OUTPUT%
+    echo Please upgrade Java. You can download it from https://adoptium.net.
+    echo.
+    goto :CHECK_FOR_PAUSE_AT_END
+)
+
+rem Locate the JAR file
+set JAR=
+for %%L in ("%~dp0" "%~dp0..\lib" "%~dp0..\share\java") do (
+    if exist "%%~L\%~n0.jar" (
+        set JAR=%%~L\%~n0.jar
     )
 )
+if not defined JAR (
+    echo Could not find %~n0.jar in %~dp0 or %~dp0..\lib or %~dp0..\share\java.
+    goto :CHECK_FOR_PAUSE_AT_END
+)
 
-echo Starting...
-"%JAVA%" -jar "%JAR%" %*
-
-:LOOP
+echo Starting Wallpaper Switcher...
+"%JAVA%" %JVM_OPTS% -jar "%JAR%" %*
 
 if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
-    call %~dp0..\libexec\find-java.bat
+    echo Java was not found. Please install Java or set the JAVA_HOME environment
+    echo variable to the directory where Java is installed. You can download Java
+    echo from https://adoptium.net.
 )
+
+:CHECK_FOR_PAUSE_AT_END
 
 rem This determines whether it has been double-clicked as an icon in Windows
 rem so that it is known that a prompt is needed to stop the Command Prompt

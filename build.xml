@@ -10,7 +10,7 @@
     <property name="app.formal.name" value="Wallpaper Switcher"/>
     <property name="main.class" value="com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher"/>
     <property name="vendor" value="Altered Mechanism"/>
-    <property name="targeted.github.release" value="4.0.0"/> <!-- Sync with next github release -->
+    <property name="targeted.github.release" value="4.1.0"/> <!-- Sync with next github release -->
     <property name="compile.target.version" value="1.6"/> <!-- JNA requires Java 6 -->
     <property name="src.dir" value="src/main/java"/>
     <property name="lib.dir" value="lib"/>
@@ -19,11 +19,12 @@
     <property name="build.dir" value="build"/>
     <property name="cls.dir" value="${build.dir}/classes"/>
     <property name="libs.dir" value="${build.dir}/libs"/>
-    <property name="run.script.dir" value="src/start/scripts"/>
+    <property name="run.script.dir" value="src/start/batch/bin"/>
     <property name="run.script" value="${run.script.dir}/${ant.project.name}.bat"/>
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
+    <property name="compiled.with.java.version" value="${build.dir}/compiled-with-java-version.txt"/>
 
     <!-- Might need a better location, but the file name is corrected from the Ant default.
 
@@ -69,7 +70,7 @@
                                                       because exec jar could have dependent
                                                       jars outside itself
              -->
-    <property name="uber.jar" value="${libs.dir}/${ant.project.name}~uber.jar"/>
+    <property name="uber.jar" value="${libs.dir}/${ant.project.name}.jar"/>
 
     <!-- It is better to put the taskdef directly here instead of using the
          include file as the documentation suggests. The include file is
@@ -153,6 +154,7 @@
     <target name="compile"
             depends="setup,compile-with-runtime-version,compile-with-specified-version"
             description="Compiles the source">
+        <echo file="${compiled.with.java.version}">${java.version}</echo>
     </target>
 
     <target name="dependent-jar" depends="compile" description="Builds an executable jar file">
@@ -230,6 +232,15 @@
 
     <target name="dist-zip" depends="uber-jar" description="Build a zip file with just binaries for distribution to users">
         <mkdir dir="${bld.dist.dir}"/>
+        <copy file="${run.script}" todir="${bld.dist.dir}"/>
+        <copy file="${uber.jar}" todir="${bld.dist.dir}"/>
+        <zip destfile="${build.dir}/libs/${ant.project.name}-${targeted.github.release}-bin.zip">
+            <fileset dir="${bld.dist.dir}" includes="**/*"/>
+        </zip>
+    </target>
+
+    <target name="dist-zip-unnecessary" depends="uber-jar" description="Build a zip file with just binaries for distribution to users">
+        <mkdir dir="${bld.dist.dir}"/>
         <mkdir dir="${bld.dist.dir}/bin"/>
         <mkdir dir="${bld.dist.dir}/lib"/>
         <copy file="${run.script}" todir="${bld.dist.dir}/bin"/>
@@ -287,4 +298,5 @@
         <delete dir="${build.dir}"/>
     </target>
 
+    <target name="all" depends="jars,dist-zip" description="Builds everything"/>
 </project>
