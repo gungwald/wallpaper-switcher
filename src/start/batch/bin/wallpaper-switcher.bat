@@ -10,6 +10,7 @@ setlocal EnableDelayedExpansion
 rem Constants
 set COMMAND_NOT_FOUND=9009
 set REQUIRED_JAVA_VERSION=11
+set JAVA_DOWNLOAD_URLS=https://adoptium.net or https://learn.microsoft.com/en-us/java/openjdk/download
 
 rem Check if JAVA_HOME is set and points to a valid java.exe
 if defined JAVA_HOME (
@@ -36,7 +37,8 @@ for /f "tokens=2 delims==." %%a in ("%JAVA_VERSION_OUTPUT%") do (
 if "%JAVA_MAJOR_VERSION%" LSS "11" (
     echo.
     echo Wallpaper Switcher requires Java %REQUIRED_JAVA_VERSION% or higher. Detected version: %JAVA_VERSION_OUTPUT%
-    echo Please upgrade Java. You can download it from https://adoptium.net.
+    echo Please upgrade Java. You can download it from
+    echo %JAVA_DOWNLOAD_URLS%.
     echo.
     goto :CHECK_FOR_PAUSE_AT_END
 )
@@ -59,7 +61,7 @@ echo Starting Wallpaper Switcher...
 if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
     echo Java was not found. Please install Java or set the JAVA_HOME environment
     echo variable to the directory where Java is installed. You can download Java
-    echo from https://adoptium.net.
+    echo from %JAVA_DOWNLOAD_URLS%.
 )
 
 :CHECK_FOR_PAUSE_AT_END
