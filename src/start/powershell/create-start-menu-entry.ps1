@@ -24,12 +24,16 @@ function createShortCut {
         [string]$shortcutPath
     )
 
-    # Create the shortcut
-    $wshShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wshShell.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = $targetFile
-    $shortcut.Save()
-    Write-Host "Shortcut '$shortcutName' created at '$shortcutPath'"
+    try {
+        $wshShell = New-Object -ComObject WScript.Shell
+        $shortcut = $wshShell.CreateShortcut($shortcutPath)
+        $shortcut.TargetPath = $targetFile
+        $shortcut.Save() # This is where the error might occur
+        Write-Host "Shortcut '$shortcutName' created at '$shortcutPath'"
+    } catch {
+        Write-Error "Failed to create shortcut: $_"
+        exit 1
+    }
 }
 
 function pause {
@@ -40,7 +44,9 @@ function pause {
 function createStartMenuEntry {
     $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
-    $shortcutPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher\$shortcutName.lnk" # For current user
+    $shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
+    makeDirectory -path $shortcutDir
+    $shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
     createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
 }
 
@@ -53,6 +59,7 @@ function pinToStartMenu {
     foreach ($verb in $verbs) {
         if ($verb.Name -match "Pin to Start") {
             $verb.DoIt()
+            Get-Error
             Write-Host "Pinned '$targetFile' to Start Menu."
             return
         }
@@ -85,8 +92,13 @@ function pinToTaskbar {
 }
 
 # Main script execution
-createStartMenuEntry
-pinToStartMenu
-createDesktopShortcut
-pinToTaskbar
+try {
+    createStartMenuEntry
+    pinToStartMenu
+    createDesktopShortcut
+    pinToTaskbar
+} catch {
+    Write-Error "An error occurred during execution: $_"
+}
+
 pause

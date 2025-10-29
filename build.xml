@@ -25,7 +25,7 @@
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
-    <property name="compiled.with.java.version" value="${build.dir}/compiled-with-java-version.txt"/>
+    <property name="compiled.with.java.version" value="${build.dir}/minimum-java-version-required-to-run-this-app.txt"/>
 
     <!-- Might need a better location, but the file name is corrected from the Ant default.
 
@@ -155,7 +155,7 @@
     <target name="compile"
             depends="setup,compile-with-runtime-version,compile-with-specified-version"
             description="Compiles the source">
-        <echo file="${compiled.with.java.version}">${java.version}</echo>
+        <echo file="${compiled.with.java.version}">${java.specification.version}</echo>
     </target>
 
     <target name="dependent-jar" depends="compile" description="Builds an executable jar file">
