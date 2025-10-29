@@ -25,7 +25,7 @@
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
-    <property name="compiled.with.java.version" value="${build.dir}/minimum-java-version-required-to-run-this-app.txt"/>
+    <property name="compiled.with.java.version" value="${build.dir}/minimum-version-of-java-required.txt"/>
 
     <!-- Might need a better location, but the file name is corrected from the Ant default.
 
