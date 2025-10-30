@@ -82,11 +82,19 @@ function pinToStartMenu {
     Write-Error "Pin to Start failed"
 }
 
+<#
+.SYNOPSIS
+    Pins a shortcut to the Taskbar.
+
+.PARAMETER targetShortcut
+    [System.__ComObject] The WshShortcut COM object representing the shortcut to be pinned.
+#>
 function pinToTaskbar {
-    $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    $shell = New-Object -ComObject Shell.Application
-    $folder = $shell.Namespace((Split-Path $targetFile))
-    $item = $folder.ParseName((Split-Path $targetFile -Leaf))
+    param ([System.__ComObject]$targetShortcut)
+
+    [System.__ComObject]$shell = New-Object -ComObject Shell.Application
+    [System.__ComObject]$folder = $shell.Namespace((Split-Path $targetShortcut.FullName))
+    [System.__ComObject]$item = $folder.ParseName((Split-Path $targetShortcut.FullName -Leaf))
     $verbs = $item.Verbs()
     foreach ($verb in $verbs) {
         write-host "pinToTaskbar: Found verb: $($verb.Name)"
@@ -102,7 +110,7 @@ function pinToTaskbar {
 
 # Main script execution
 try {
-    $shortcut = createStartMenuEntry
+    [System.__ComObject]$shortcut = createStartMenuEntry
     Write-host $shortcut.getType().FullName
     $shortcut | Get-Member -Force
     createDesktopShortcut
