@@ -26,8 +26,8 @@ function createShortCut {
     )
 
     try {
-        $wshShell = New-Object -ComObject WScript.Shell
-        $shortcut = $wshShell.CreateShortcut($shortcutPath)
+        $wshShell = New-Object -ComObject WScript.Shell # https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
+        $shortcut = $wshShell.CreateShortcut($shortcutPath) # https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xsy6k3ys(v=vs.84)
         $shortcut.TargetPath = $targetFile
         $shortcut.Save() # This is where the error might occur
         return $shortcut
@@ -87,15 +87,21 @@ function pinToStartMenu {
     Pins a shortcut to the Taskbar.
 
 .PARAMETER targetShortcut
-    [System.__ComObject] The WshShortcut COM object representing the shortcut to be pinned.
+    [System.__ComObject] Shortcut to be pinned
 #>
 function pinToTaskbar {
-    param ([System.__ComObject]$targetShortcut)
+    param ([System.__ComObject]$targetShortcut) # WshShortcut @ https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xk6kst2k(v=vs.84)
 
-    [System.__ComObject]$shell = New-Object -ComObject Shell.Application
-    [System.__ComObject]$folder = $shell.Namespace((Split-Path $targetShortcut.FullName))
-    [System.__ComObject]$item = $folder.ParseName((Split-Path $targetShortcut.FullName -Leaf))
-    $verbs = $item.Verbs()
+    [System.__ComObject]$shell # The COM type is: Shell https://learn.microsoft.com/en-us/windows/win32/shell/shell
+    [System.__ComObject]$folder # The COM type is: Folder https://learn.microsoft.com/en-us/windows/win32/shell/folder
+    [System.__ComObject]$folderItem # The COM type is: FolderItem https://learn.microsoft.com/en-us/windows/win32/shell/folderitem
+    [System.__ComObject]$verbs # The COM type is: FolderItemVerbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverbs
+
+    $shell = New-Object -ComObject Shell.Application # Not sure why this is Shell.Application object and not WScript.Shell
+    $targetFullName = $targetShortcut.FullName # FullName property @ https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/7c7x465d(v=vs.84)
+    $folder = $shell.Namespace((Split-Path $targetFullName))
+    $folderItem = $folder.ParseName((Split-Path $targetFullName -Leaf)) # ParseName method @ https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
+    $verbs = $folderItem.Verbs() # Verbs method @ https://learn.microsoft.com/en-us/windows/win32/shell/folderitem-verbs
     foreach ($verb in $verbs) {
         write-host "pinToTaskbar: Found verb: $($verb.Name)"
         if ($verb.Name -match "Pin to Taskbar") {
