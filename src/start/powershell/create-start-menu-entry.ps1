@@ -29,7 +29,6 @@ function createShortCut {
         $shortcut = $wshShell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $targetFile
         $shortcut.Save() # This is where the error might occur
-        Write-Host "Shortcut '$shortcutName' created at '$shortcutPath'"
     } catch {
         Write-Error "Failed to create shortcut: $_"
         exit 1
@@ -48,6 +47,7 @@ function createStartMenuEntry {
     makeDirectory -path $shortcutDir
     $shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
     createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    Write-Host "Start Menu entry created"
 }
 
 function pinToStartMenu {
@@ -57,22 +57,24 @@ function pinToStartMenu {
     $item = $folder.ParseName((Split-Path $targetFile -Leaf))
     $verbs = $item.Verbs()
     foreach ($verb in $verbs) {
+        write-host "pinToStartMenu: Found verb: $($verb.Name)"
         if ($verb.Name -match "Pin to Start") {
             $verb.DoIt()
             Get-Error
-            Write-Host "Pinned '$targetFile' to Start Menu."
+            Write-Host "Pinned to Start Menu."
             return
         }
     }
-    Write-Host "Pin to Start option not found for '$targetFile'. It may already be pinned."
+    Write-Error "Pin to Start failed"
 }
 
 function createDesktopShortcut {
     $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
-    $desktopPath = [User.Environment]::GetFolderPath("Desktop")
+    $desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
     $shortcutPath = "$desktopPath\$shortcutName.lnk"
     createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    Write-host "Desktop shortcut created."
 }
 
 function pinToTaskbar {
@@ -82,13 +84,15 @@ function pinToTaskbar {
     $item = $folder.ParseName((Split-Path $targetFile -Leaf))
     $verbs = $item.Verbs()
     foreach ($verb in $verbs) {
+        write-host "pinToTaskbar: Found verb: $($verb.Name)"
         if ($verb.Name -match "Pin to Taskbar") {
             $verb.DoIt()
-            Write-Host "Pinned '$targetFile' to Taskbar."
+            Get-Error
+            Write-Host "Pinned to Taskbar."
             return
         }
     }
-    Write-Host "Pin to Taskbar option not found for '$targetFile'. It may already be pinned."
+    Write-Error "Pin to Taskbar failed"
 }
 
 # Main script execution
