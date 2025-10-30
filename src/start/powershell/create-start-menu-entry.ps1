@@ -11,7 +11,8 @@ function makeDirectory {
         try {
             New-Item -Path $path -ItemType Directory -ErrorAction Stop | Out-Null
         } catch {
-            Write-Error "Failed to create directory: $_"
+            Write-Error "Failed to create directory: $_.Exception.Message"
+            Write-Error "Stack Trace: $_.ScriptStackTrace"
             exit 1
         }
     }
@@ -29,8 +30,10 @@ function createShortCut {
         $shortcut = $wshShell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $targetFile
         $shortcut.Save() # This is where the error might occur
+        return $shortcut
     } catch {
-        Write-Error "Failed to create shortcut: $_"
+        Write-Error "Failed to create shortcut: $_.Exception.Message"
+        Write-Error "Stack Trace: $_.ScriptStackTrace"
         exit 1
     }
 }
@@ -46,8 +49,19 @@ function createStartMenuEntry {
     $shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
     makeDirectory -path $shortcutDir
     $shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
-    createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    $shortcut = createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
     Write-Host "Start Menu entry created"
+    return $shortcut
+}
+
+function createDesktopShortcut {
+    $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
+    $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
+    $desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
+    $shortcutPath = "$desktopPath\$shortcutName.lnk"
+    createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    Write-host "Desktop shortcut created."
+    return $shortcut
 }
 
 function pinToStartMenu {
@@ -66,15 +80,6 @@ function pinToStartMenu {
         }
     }
     Write-Error "Pin to Start failed"
-}
-
-function createDesktopShortcut {
-    $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
-    $desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
-    $shortcutPath = "$desktopPath\$shortcutName.lnk"
-    createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
-    Write-host "Desktop shortcut created."
 }
 
 function pinToTaskbar {
@@ -97,12 +102,15 @@ function pinToTaskbar {
 
 # Main script execution
 try {
-    createStartMenuEntry
-    pinToStartMenu
+    $shortcut = createStartMenuEntry
+    Write-host $shortcut.getType().FullName
+    $shortcut | Get-Member -Force
     createDesktopShortcut
-    pinToTaskbar
+    pinToStartMenu $shortcut
+    pinToTaskbar $shortcut
 } catch {
-    Write-Error "An error occurred during execution: $_"
+    Write-Error "An error occurred during execution: $_.Exception.Message"
+    Write-Error "Stack Trace: $_.ScriptStackTrace"
 }
 
 pause
