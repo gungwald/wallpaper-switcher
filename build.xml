@@ -21,7 +21,7 @@
     <property name="libs.dir" value="${build.dir}/libs"/>
     <property name="run.script.dir" value="src/start/batch/bin"/>
     <property name="run.script" value="${run.script.dir}/${ant.project.name}.bat"/>
-    <property name="start.menu.script" value="src/start/powershell/create-start-menu-entry.ps1"/>
+    <property name="start.menu.script" value="src/start/powershell/create-shortcuts.ps1"/>
     <property name="sys.install.dir" value="C:\Program Files\Wallpaper Switcher"/>
     <property name="bld.dist.dir" value="${build.dir}/distribution"/>
     <property name="user.install.dir" value="${user.home}/opt/${ant.project.name}"/>
