@@ -1,6 +1,36 @@
 #
-# This script creates a Start Menu shortcut for a specified program.
+# This script creates a Start Menu shortcut and other shortcuts for a specified program.
 #
+
+<#
+Below are links to relevant documentation for the COM objects, methods, and properties used in this script.
+Because PowerShell does not have built-in type annotations for COM objects, these links serve as references for
+understanding the types involved.
+
+Powershell only supports basic type annotations for COM objects using [System.__ComObject], so the specific COM
+types are indicated in comments, like this: [System.__ComObject]<# WshShortcut #\>.
+
+If Powershell was a real language like Java, with static typing, this would not be necessary.
+
+COM Object Types:
+    WScript.Shell https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
+    WshShell https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
+    WshShortcut https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xk6kst2k(v=vs.84)
+    Folder https://learn.microsoft.com/en-us/windows/win32/shell/folder
+    FolderItem https://learn.microsoft.com/en-us/windows/win32/shell/folderitem
+    FolderItemVerbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverbs
+
+Methods:
+    WshShell.CreateShortcut https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xsy6k3ys(v=vs.84)
+    WshShell.Namespace https://learn.microsoft.com/en-us/windows/win32/shell/shell-namespace
+    WshShell.ParseName https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
+    FolderItem.Verbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitem-verbs
+    FolderItemVerbs.DoIt https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverb-doit
+
+Properties:
+    WshShortcut.FullName https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/7c7x465d(v=vs.84)
+    WshShortcut.TargetPath https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/594k4c67(v=vs.84)
+#>
 
 # Function to create directory if it doesn't exist
 function makeDirectory {
@@ -9,7 +39,7 @@ function makeDirectory {
     )
     if (-not (Test-Path -Path $path)) {
         try {
-            New-Item -Path $path -ItemType Directory -ErrorAction Stop | Out-Null
+            New-Item -Path $path -ItemType Directory
         } catch {
             Write-Error "Failed to create directory: $_.Exception.Message"
             Write-Error "Stack Trace: $_.ScriptStackTrace"
@@ -18,16 +48,15 @@ function makeDirectory {
     }
 }
 
-function createShortCut {
+function createShortcut {
     param (
-        [string]$shortcutName,
         [string]$targetFile,
         [string]$shortcutPath
     )
 
     try {
-        $wshShell = New-Object -ComObject WScript.Shell # https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
-        $shortcut = $wshShell.CreateShortcut($shortcutPath) # https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xsy6k3ys(v=vs.84)
+        [System.__ComObject]<# WshShell #>   $wshShell = New-Object -ComObject WScript.Shell
+        [System.__ComObject]<# WshShortcut #>$shortcut = $wshShell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $targetFile
         $shortcut.Save() # This is where the error might occur
         return $shortcut
@@ -44,22 +73,22 @@ function pause {
 }
 
 function createStartMenuEntry {
-    $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
-    $shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
+    [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
+    [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
+    [string]$shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
     makeDirectory -path $shortcutDir
-    $shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
-    $shortcut = createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    [string]$shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
+    [System.__ComObject]<# WshShortcut #>$shortcut = createShortcut -targetFile $targetFile -shortcutPath $shortcutPath
     Write-Host "Start Menu entry created"
     return $shortcut
 }
 
 function createDesktopShortcut {
-    $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    $shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
-    $desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
-    $shortcutPath = "$desktopPath\$shortcutName.lnk"
-    createShortCut -shortcutName $shortcutName -targetFile $targetFile -shortcutPath $shortcutPath
+    [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
+    [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
+    [string]$desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
+    [string]$shortcutPath = "$desktopPath\$shortcutName.lnk"
+    [System.__ComObject]<# WshShortcut #>$shortcut = createShortcut -targetFile $targetFile -shortcutPath $shortcutPath
     Write-host "Desktop shortcut created."
     return $shortcut
 }
@@ -87,21 +116,22 @@ function pinToStartMenu {
     Pins a shortcut to the Taskbar.
 
 .PARAMETER targetShortcut
-    [System.__ComObject] Shortcut to be pinned
+    [System.__ComObject] A WshShortcut COM object to be pinned
+
+.OUTPUTS
+    [System.Void] This function does not return a value.
 #>
 function pinToTaskbar {
-    param ([System.__ComObject]$targetShortcut) # WshShortcut @ https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xk6kst2k(v=vs.84)
+    OutputType([System.Void])
+    param (
+        [System.__ComObject]$targetShortcut # The COM type is WshShortcut
+    )
 
-    [System.__ComObject]$shell # The COM type is: Shell https://learn.microsoft.com/en-us/windows/win32/shell/shell
-    [System.__ComObject]$folder # The COM type is: Folder https://learn.microsoft.com/en-us/windows/win32/shell/folder
-    [System.__ComObject]$folderItem # The COM type is: FolderItem https://learn.microsoft.com/en-us/windows/win32/shell/folderitem
-    [System.__ComObject]$verbs # The COM type is: FolderItemVerbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverbs
-
-    $shell = New-Object -ComObject Shell.Application # Not sure why this is Shell.Application object and not WScript.Shell
-    $targetFullName = $targetShortcut.FullName # FullName property @ https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/7c7x465d(v=vs.84)
-    $folder = $shell.Namespace((Split-Path $targetFullName))
-    $folderItem = $folder.ParseName((Split-Path $targetFullName -Leaf)) # ParseName method @ https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
-    $verbs = $folderItem.Verbs() # Verbs method @ https://learn.microsoft.com/en-us/windows/win32/shell/folderitem-verbs
+    [System.__ComObject]<# WshShell #>        $shell = New-Object -ComObject Shell.Application # Not sure why this is Shell.Application object and not WScript.Shell
+    [string]                                  $targetFullName = $targetShortcut.FullName
+    [System.__ComObject]<# Folder #>          $folder = $shell.Namespace((Split-Path $targetFullName))
+    [System.__ComObject]<# FolderItem #>      $folderItem = $folder.ParseName((Split-Path $targetFullName -Leaf))
+    [System.__ComObject]<# FolderItemVerbs #> $verbs = $folderItem.Verbs()
     foreach ($verb in $verbs) {
         write-host "pinToTaskbar: Found verb: $($verb.Name)"
         if ($verb.Name -match "Pin to Taskbar") {
@@ -114,17 +144,22 @@ function pinToTaskbar {
     Write-Error "Pin to Taskbar failed"
 }
 
-# Main script execution
-try {
-    [System.__ComObject]$shortcut = createStartMenuEntry
-    Write-host $shortcut.getType().FullName
-    $shortcut | Get-Member -Force
-    createDesktopShortcut
-    pinToStartMenu $shortcut
-    pinToTaskbar $shortcut
-} catch {
-    Write-Error "An error occurred during execution: $_.Exception.Message"
-    Write-Error "Stack Trace: $_.ScriptStackTrace"
+function createAllShortcuts
+{
+    try
+    {
+        [System.__ComObject]<# WshShortcut #>$shortcut = createStartMenuEntry
+        createDesktopShortcut
+        pinToStartMenu $shortcut
+        pinToTaskbar $shortcut
+    }
+    catch
+    {
+        Write-Error "An error occurred during execution: $_.Exception.Message"
+        Write-Error "Stack Trace: $_.ScriptStackTrace"
+    }
 }
 
+# Main script execution
+createAllShortcuts
 pause
