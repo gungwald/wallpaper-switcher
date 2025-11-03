@@ -34,6 +34,7 @@ Properties:
 
 # Function to create directory if it doesn't exist
 function makeDirectory {
+    OutputType([System.Void])
     param (
         [string]$path
     )
@@ -49,6 +50,7 @@ function makeDirectory {
 }
 
 function createShortcut {
+    OutputType([System.__ComObject]) # The COM type is WshShortcut
     param (
         [string]$targetFile,
         [string]$shortcutPath
@@ -68,11 +70,13 @@ function createShortcut {
 }
 
 function pause {
+    OutputType([System.Void])
     Write-Host "Press any key to continue..."
     [void][System.Console]::ReadKey($FALSE)
 }
 
 function createStartMenuEntry {
+    OutputType([System.__ComObject]) # The COM type is WshShortcut
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
     [string]$shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
@@ -84,6 +88,7 @@ function createStartMenuEntry {
 }
 
 function createDesktopShortcut {
+    OutputType([System.__ComObject]) # The COM type is WshShortcut
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
     [string]$desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
@@ -94,6 +99,7 @@ function createDesktopShortcut {
 }
 
 function pinToStartMenu {
+    OutputType([System.Void])
     $targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     $shell = New-Object -ComObject Shell.Application
     $folder = $shell.Namespace((Split-Path $targetFile))
@@ -146,6 +152,7 @@ function pinToTaskbar {
 
 function createAllShortcuts
 {
+    OutputType([System.Void])
     try
     {
         [System.__ComObject]<# WshShortcut #>$shortcut = createStartMenuEntry
