@@ -1,16 +1,48 @@
 @echo off
 
-rem Some JVMs require this to allow access to native code.
-rem If your JVM does not require this, you can comment out this line.
-rem If your JVM requires other options, you can add them here.
-set JVM_OPTS=--enable-native-access=ALL-UNNAMED
+rem ----------------------------------------------------------------------------
+rem Generic Java Application Launcher
+rem
+rem Copyright (c) 2025 Bill Chatfield
+rem
+rem This program is free software; you can redistribute it and/or modify
+rem it under the terms of the GNU General Public License as published by
+rem the Free Software Foundation; either version 2 of the License, or (at
+rem your option) any later version.
+rem
+rem This program is distributed in the hope that it will be useful, but
+rem WITHOUT ANY WARRANTY; without even implied warranty of
+rem MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+rem General Public License for more details.
+rem
+rem You should have received a copy of the GNU General Public License along
+rem with this program; If not, see <http://www.gnu.org/licenses/>.
+rem ----------------------------------------------------------------------------
+
+rem DESCRIPTION:
+rem This script runs any .JAR file named the same as this script but with a
+rem .jar extension instead of a .bat extension. So, these script does not
+rem need to be modified for each different application. Just copy this script
+rem and name it the same as the .JAR file you want to run.
+rem    Example: wallpaper-switcher.bat runs wallpaper-switcher.jar
+rem    Example: myapp.bat runs myapp.jar
+
+rem WHY NOT POWERSHELL?
+rem This script must be written in batch because we can't depend on PowerShell
+rem being enabled on the user's system. It is disabled by default by Microsoft
+rem on all Windows systems because Microsoft is stupid. Why not disable CMD,
+rem too, while they're at it? And .BAT files and .EXE files too. Then the
+rem system would be really secure. /sarcasm
+
 
 setlocal EnableDelayedExpansion
 
-rem Constants
+rem Define constants
 set COMMAND_NOT_FOUND=9009
 set REQUIRED_JAVA_VERSION=8
 set JAVA_DOWNLOAD_URLS=https://adoptium.net or https://learn.microsoft.com/en-us/java/openjdk/download
+rem Some JVMs require this to allow access to native code.
+set JVM_OPTS=--enable-native-access=ALL-UNNAMED
 
 rem Check if JAVA_HOME is set and points to a valid java.exe
 if defined JAVA_HOME (
@@ -27,26 +59,53 @@ if defined JAVA_HOME (
     set JAVA=java
 )
 
-rem Check if Java version is high enough to run the application.
-rem Copilot couldn't get this right, but I did. I wrote it before Copilot
-rem even existed.
+rem Extract the Java version from the "java -version" output, which is sent to
+rem stderr, so redirect stderr to stdout. The version string is on the first
+rem line, in the format: openjdk version "x.y.z"
+rem The code below gets the third token from the first line and then exits
+rem the loop.
 set JAVA_VERSION_OUTPUT=
 for /f "tokens=3" %%v in ('"%JAVA%" -version 2^>^&1') do (
+    rem Pull out the version string and remove the quotes
     set JAVA_VERSION_OUTPUT=%%~v
+    rem Exit the loop after the first line because the version is on the
+    rem first line. If we don't exit here, we would get the 3rd token from
+    rem all lines, and the last line would win.
+    goto :JAVA_VERSION_DETECTED
 )
-for /f "tokens=2 delims==." %%a in ("%JAVA_VERSION_OUTPUT%") do (
-    set JAVA_MAJOR_VERSION=%%a
+:JAVA_VERSION_DETECTED
+
+rem Get the major version number from the version string.
+rem For version strings starting with "1.", the major version is the second
+rem number (e.g., "1.8.0_292" -> 8).
+rem For version strings starting with a number greater than "1.", the major
+rem version is the first number (e.g., "11.0.11" -> 11).
+set JAVA_MAJOR_VERSION=
+if "%JAVA_VERSION_OUTPUT:~0,2%"=="1." (
+    for /f "tokens=2 delims==." %%m in ("%JAVA_VERSION_OUTPUT%") do (
+        set JAVA_MAJOR_VERSION=%%m
+    )
+) else (
+    for /f "tokens=1 delims==." %%m in ("%JAVA_VERSION_OUTPUT%") do (
+        set JAVA_MAJOR_VERSION=%%m
+    )
 )
+
+rem Compare the major version number to the required version.
 if "%JAVA_MAJOR_VERSION%" LSS "%REQUIRED_JAVA_VERSION%" (
     echo.
-    echo Wallpaper Switcher requires Java %REQUIRED_JAVA_VERSION% or higher. Detected version: %JAVA_VERSION_OUTPUT%
+    echo %~n0 requires Java %REQUIRED_JAVA_VERSION% or higher.
+    echo     Detected version: %JAVA_VERSION_OUTPUT%
+    echo     Detected major version: %JAVA_MAJOR_VERSION%
+    echo.
     echo Please upgrade Java. You can download it from
     echo %JAVA_DOWNLOAD_URLS%.
     echo.
     goto :CHECK_FOR_PAUSE_AT_END
 )
 
-rem Locate the JAR file
+rem Locate the JAR file. Check in the same directory as this script,
+rem then in ../lib, then in ../share/java.
 set JAR=
 for %%L in ("%~dp0" "%~dp0..\lib" "%~dp0..\share\java") do (
     if exist "%%~L\%~n0.jar" (
@@ -58,9 +117,11 @@ if not defined JAR (
     goto :CHECK_FOR_PAUSE_AT_END
 )
 
-echo Starting Wallpaper Switcher...
+rem Run the Java application
+echo Starting %JAR%...
 "%JAVA%" %JVM_OPTS% -jar "%JAR%" %*
 
+rem Check if the java command was not found
 if "%ERRORLEVEL%"=="%COMMAND_NOT_FOUND%" (
     echo Java was not found. Please install Java or set the JAVA_HOME environment
     echo variable to the directory where Java is installed. You can download Java
@@ -81,7 +142,7 @@ for /f "tokens=2" %%a in ("%CMDCMDLINE%") do (
     )
 )
 
-rem Another option to force a pause at the end.
+rem This can be set before calling this script to ensure a pause happens.
 if "%PAUSE_AT_END%"=="true" pause
 
 endlocal
