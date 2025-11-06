@@ -91,8 +91,12 @@ if "%JAVA_VERSION_OUTPUT:~0,2%"=="1." (
     )
 )
 
-rem Compare the major version number to the required version.
-if "%JAVA_MAJOR_VERSION%" LSS "%REQUIRED_JAVA_VERSION%" (
+rem Compare the major version number to the required version. The arguments
+rem must be numeric to get a numeric comparison. So they can't be surrounded
+rem by quotes. This means that if the version detection failed, the first
+rem argument will be empty, which will cause a syntax error. A potential
+rem solution would be to surround them both with zeros instead of quotes.
+if %JAVA_MAJOR_VERSION% LSS %REQUIRED_JAVA_VERSION% (
     echo.
     echo %~n0 requires Java %REQUIRED_JAVA_VERSION% or higher.
     echo     Detected version: %JAVA_VERSION_OUTPUT%
