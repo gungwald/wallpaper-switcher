@@ -213,7 +213,6 @@ function main
     {
         $global:shell = New-Object -ComObject WScript.Shell # $shell gets WshShell COM type
         createAllShortcuts
-        pause
     }
     catch
     {
@@ -223,3 +222,4 @@ function main
 }
 
 main
+pause # Pause to allow user to see any errors before the window closes. Can't be inside try/catch because we want it to always execute.
