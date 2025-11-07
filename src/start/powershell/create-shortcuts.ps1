@@ -104,6 +104,7 @@ function createShortcut {
 #>
 function pause {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     Write-Host "Press any key to continue..."
     [void][System.Console]::ReadKey($FALSE)
 }
@@ -116,6 +117,7 @@ function pause {
 #>
 function createStartMenuEntry {
     [OutputType([System.__ComObject])] # The COM type is WshShortcut
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
     [string]$shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
@@ -128,6 +130,7 @@ function createStartMenuEntry {
 
 function createDesktopShortcut {
     [OutputType([System.__ComObject])] # The COM type is WshShortcut
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
     [string]$desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
@@ -139,6 +142,7 @@ function createDesktopShortcut {
 
 function pinToStartMenu {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
     [System.__ComObject]$folder = $global:shell.Namespace((Split-Path $targetFile)) # COM type Folder is returned
     [System.__ComObject]$item = $folder.ParseName((Split-Path $targetFile -Leaf)) # COM type FolderItem is returned
@@ -189,6 +193,7 @@ function pinToTaskbar {
 
 function createAllShortcuts {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     [System.__ComObject]$shortcut = createStartMenuEntry # WshShortcut COM type is assigned to $shortcut
     createDesktopShortcut
     pinToStartMenu $shortcut
@@ -196,6 +201,8 @@ function createAllShortcuts {
 }
 
 function main {
+    [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    param() # This is required to be here or the above OutputType attribute will cause an error.
     try {
         $global:shell = New-Object -ComObject WScript.Shell # $shell gets WshShell COM type
         createAllShortcuts
