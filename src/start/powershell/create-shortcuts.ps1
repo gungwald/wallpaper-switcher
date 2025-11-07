@@ -41,7 +41,7 @@ COM Object Types:
 
 Methods:
     WshShell.CreateShortcut https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xsy6k3ys(v=vs.84)
-    WshShell.Namespace https://learn.microsoft.com/en-us/windows/win32/shell/shell-namespace
+    WshShell.NameSpace https://learn.microsoft.com/en-us/windows/win32/shell/shell-namespace
     WshShell.ParseName https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
     FolderItem.Verbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitem-verbs
     FolderItemVerbs.DoIt https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverb-doit
@@ -144,7 +144,7 @@ function pinToStartMenu {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
     [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    [System.__ComObject]$folder = $global:shell.Namespace((Split-Path $targetFile)) # COM type Folder is returned
+    [System.__ComObject]$folder = $global:shell.NameSpace((Split-Path $targetFile)) # COM type Folder is returned
     [System.__ComObject]$item = $folder.ParseName((Split-Path $targetFile -Leaf)) # COM type FolderItem is returned
     [System.__ComObject]$verbs = $item.Verbs() # COM type FolderItemVerbs is assigned to $verbs
     foreach ($verb in $verbs) {
@@ -176,7 +176,7 @@ function pinToTaskbar {
     )
 
     [string]                                  $targetFullName = $targetShortcut.FullName
-    [System.__ComObject]<# Folder #>          $folder = $global:shell.Namespace((Split-Path $targetFullName))
+    [System.__ComObject]<# Folder #>          $folder = $global:shell.NameSpace((Split-Path $targetFullName))
     [System.__ComObject]<# FolderItem #>      $folderItem = $folder.ParseName((Split-Path $targetFullName -Leaf))
     [System.__ComObject]<# FolderItemVerbs #> $verbs = $folderItem.Verbs()
     foreach ($verb in $verbs) {
@@ -201,7 +201,7 @@ function createAllShortcuts {
 }
 
 function main {
-    [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    [OutputType([System.Int32])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
     try {
         $global:shell = New-Object -ComObject WScript.Shell # $shell gets WshShell COM type
@@ -209,8 +209,8 @@ function main {
         return $global:EXIT_SUCCESS
     }
     catch {
-        Write-Error "An error occurred during execution: $_.Exception.Message"
-        Write-Error "Stack Trace: $_.ScriptStackTrace"
+        Write-Error "[$_.Exception.Message]"
+        Write-Error "Stack Trace: [$_.ScriptStackTrace]"
         return $global:EXIT_FAILURE
     }
 }
