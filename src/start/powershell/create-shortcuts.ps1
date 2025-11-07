@@ -70,13 +70,7 @@ function makeDirectory {
         [string]$path
     )
     if (-not (Test-Path -Path $path)) {
-        try {
-            New-Item -Path $path -ItemType Directory
-        } catch {
-            Write-Error "Failed to create directory: $_.Exception.Message"
-            Write-Error "Stack Trace: $_.ScriptStackTrace"
-            exit $global:EXIT_FAILURE
-        }
+        New-Item -Path $path -ItemType Directory # Should throw exception on failure
     }
 }
 
@@ -96,16 +90,10 @@ function createShortcut {
         [string]$targetFile,
         [string]$shortcutPath
     )
-    try {
-        [System.__ComObject]$shortcut = $global:shell.CreateShortcut($shortcutPath) # $shortcut gets WshShortcut COM type
-        $shortcut.TargetPath = $targetFile
-        $shortcut.Save() # This is where the error might occur
-        return $shortcut
-    } catch {
-        Write-Error "Failed to create shortcut: $_.Exception.Message"
-        Write-Error "Stack Trace: $_.ScriptStackTrace"
-        exit $global:EXIT_FAILURE
-    }
+    [System.__ComObject]$shortcut = $global:shell.CreateShortcut($shortcutPath) # $shortcut gets WshShortcut COM type
+    $shortcut.TargetPath = $targetFile
+    $shortcut.Save() # This is where the error might occur. It should throw an exception on failure.
+    return $shortcut
 }
 
 <#
@@ -207,19 +195,19 @@ function createAllShortcuts {
     pinToTaskbar $shortcut
 }
 
-function main
-{
-    try
-    {
+function main {
+    try {
         $global:shell = New-Object -ComObject WScript.Shell # $shell gets WshShell COM type
         createAllShortcuts
+        return $global:EXIT_SUCCESS
     }
-    catch
-    {
+    catch {
         Write-Error "An error occurred during execution: $_.Exception.Message"
         Write-Error "Stack Trace: $_.ScriptStackTrace"
+        return $global:EXIT_FAILURE
     }
 }
 
-main
+[int]$status = main
 pause # Pause to allow user to see any errors before the window closes. Can't be inside try/catch because we want it to always execute.
+exit $status
