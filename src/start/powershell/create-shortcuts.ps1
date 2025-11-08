@@ -151,18 +151,18 @@ function performVerb
     [System.__ComObject]<# Folder #>$folder = $global:shellApp.NameSpace((Split-Path $fileToPerformVerbOn))
     [System.__ComObject]<# FolderItem #>$item = $folder.ParseName((Split-Path $fileToPerformVerbOn -Leaf))
     [System.__ComObject]<# FolderItemVerbs #>$verbs = $item.Verbs()
+    # $verb will have type System.__ComObject and COM type FolderItemVerb
     foreach ($verb in $verbs)
     {
-        # $verb is of COM type FolderItemVerb
         write-host "pinToStartMenu: Found verb: $( $verb.Name )"
-        if ($verb.Name -eq $textOfVerbToPerform)
+        if ($verb.Name -match $textOfVerbToPerform)
         {
             $verb.DoIt()
             Write-Host "Performed: $textOfVerbToPerform."
             return
         }
-        Write-Error "Failed to $textOfVerbToPerform"
     }
+    Write-Error "Failed to $textOfVerbToPerform"
 }
 
 function pinToStartMenu {
@@ -186,7 +186,7 @@ function pinToTaskbar {
     param (
         [System.__ComObject]$targetShortcut # The COM type is WshShortcut
     )
-    performVerb("Pin to Taskbar", $targetShortcut.TargetPath)
+    performVerb "Pin to Taskbar" $targetShortcut.TargetPath
 }
 
 function createAllShortcuts {
