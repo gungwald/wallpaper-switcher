@@ -41,8 +41,8 @@ COM Object Types:
 
 Methods:
     WshShell.CreateShortcut https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xsy6k3ys(v=vs.84)
-    WshShell.NameSpace https://learn.microsoft.com/en-us/windows/win32/shell/shell-namespace
-    WshShell.ParseName https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
+    Shell.NameSpace https://learn.microsoft.com/en-us/windows/win32/shell/shell-namespace
+    Folder.ParseName https://learn.microsoft.com/en-us/windows/win32/shell/folder-parsename
     FolderItem.Verbs https://learn.microsoft.com/en-us/windows/win32/shell/folderitem-verbs
     FolderItemVerbs.DoIt https://learn.microsoft.com/en-us/windows/win32/shell/folderitemverb-doit
 
