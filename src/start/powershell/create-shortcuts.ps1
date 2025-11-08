@@ -32,8 +32,8 @@ types are indicated in comments, like this: [System.__ComObject]<# WshShortcut #
 If PowerShell was a real language like Java, with static typing, this would not be necessary.
 
 COM Object Types:
-    WScript.Shell https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
     WshShell https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/aew9yb99(v=vs.84)
+    Shell https://learn.microsoft.com/en-us/windows/win32/shell/shell
     WshShortcut https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/windows-scripting/xk6kst2k(v=vs.84)
     Folder https://learn.microsoft.com/en-us/windows/win32/shell/folder
     FolderItem https://learn.microsoft.com/en-us/windows/win32/shell/folderitem
@@ -54,7 +54,8 @@ Properties:
 # Global variables
 [int]$global:EXIT_SUCCESS = 0
 [int]$global:EXIT_FAILURE = 1
-[System.__ComObject]$global:shell = $null # The COM type will be WshShell. Creation needs to be in try/catch block
+[System.__ComObject]$global:wshShell = $null # The COM type will be WshShell. Creation needs to be inside try/catch block
+[System.__ComObject]$global:shellApp = $null # The COM type will be Shell. Creation needs to be inside try/catch block
 
 <#
 .SYNOPSIS
@@ -90,9 +91,9 @@ function createShortcut {
         [string]$targetFile,
         [string]$shortcutPath
     )
-    [System.__ComObject]$shortcut = $global:shell.CreateShortcut($shortcutPath) # $shortcut gets WshShortcut COM type
+    [System.__ComObject]$shortcut = $global:wshShell.CreateShortcut($shortcutPath) # $shortcut gets WshShortcut COM type
     $shortcut.TargetPath = $targetFile
-    $shortcut.Save() # This is where the error might occur. It should throw an exception on failure.
+    $shortcut.Save() # This is where the error might occur. It should throw an exception on failure which will be caught in main.
     return $shortcut
 }
 
@@ -105,8 +106,8 @@ function createShortcut {
 function pause {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    Write-Host "Press any key to continue..."
-    [void][System.Console]::ReadKey($FALSE)
+    Write-Host "Press any key to continue..." # Same as pause in cmd.exe
+    [void][System.Console]::ReadKey($FALSE) # Read a key without displaying it and without requiring Enter
 }
 
 <#
@@ -140,23 +141,34 @@ function createDesktopShortcut {
     return $shortcut
 }
 
+function performVerb
+{
+    [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
+    param (
+        [string]$textOfVerbToPerform,
+        [string]$fileToPerformVerbOn
+    )
+    [System.__ComObject]<# Folder #>$folder = $global:shellApp.NameSpace((Split-Path $fileToPerformVerbOn))
+    [System.__ComObject]<# FolderItem #>$item = $folder.ParseName((Split-Path $fileToPerformVerbOn -Leaf))
+    [System.__ComObject]<# FolderItemVerbs #>$verbs = $item.Verbs()
+    foreach ($verb in $verbs)
+    {
+        # $verb is of COM type FolderItemVerb
+        write-host "pinToStartMenu: Found verb: $( $verb.Name )"
+        if ($verb.Name -eq $textOfVerbToPerform)
+        {
+            $verb.DoIt()
+            Write-Host "Performed: $textOfVerbToPerform."
+            return
+        }
+        Write-Error "Failed to $textOfVerbToPerform"
+    }
+}
+
 function pinToStartMenu {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    [System.__ComObject]$folder = $global:shell.NameSpace((Split-Path $targetFile)) # COM type Folder is returned
-    [System.__ComObject]$item = $folder.ParseName((Split-Path $targetFile -Leaf)) # COM type FolderItem is returned
-    [System.__ComObject]$verbs = $item.Verbs() # COM type FolderItemVerbs is assigned to $verbs
-    foreach ($verb in $verbs) {
-        write-host "pinToStartMenu: Found verb: $($verb.Name)"
-        if ($verb.Name -match "Pin to Start") {
-            $verb.DoIt()
-            Get-Error
-            Write-Host "Pinned to Start Menu."
-            return
-        }
-    }
-    Write-Error "Pin to Start failed"
+    performVerb "Pin to Start" "$PSScriptRoot\wallpaper-switcher.bat"
 }
 
 <#
@@ -174,21 +186,7 @@ function pinToTaskbar {
     param (
         [System.__ComObject]$targetShortcut # The COM type is WshShortcut
     )
-
-    [string]                                  $targetFullName = $targetShortcut.FullName
-    [System.__ComObject]<# Folder #>          $folder = $global:shell.NameSpace((Split-Path $targetFullName))
-    [System.__ComObject]<# FolderItem #>      $folderItem = $folder.ParseName((Split-Path $targetFullName -Leaf))
-    [System.__ComObject]<# FolderItemVerbs #> $verbs = $folderItem.Verbs()
-    foreach ($verb in $verbs) {
-        write-host "pinToTaskbar: Found verb: $($verb.Name)"
-        if ($verb.Name -match "Pin to Taskbar") {
-            $verb.DoIt()
-            Get-Error
-            Write-Host "Pinned to Taskbar."
-            return
-        }
-    }
-    Write-Error "Pin to Taskbar failed"
+    performVerb("Pin to Taskbar", $targetShortcut.TargetPath)
 }
 
 function createAllShortcuts {
@@ -201,20 +199,18 @@ function createAllShortcuts {
 }
 
 function main {
-    [OutputType([System.Int32])] # This is an attribute, not a command. So it is enclosed in square brackets.
-    param() # This is required to be here or the above OutputType attribute will cause an error.
     try {
-        $global:shell = New-Object -ComObject WScript.Shell # $shell gets WshShell COM type
+        $global:wshShell = New-Object -ComObject WScript.Shell # $wshShell gets an object of WshShell COM type
+        $global:shellApp = New-Object -ComObject Shell.Application # $shellApp gets an object of Shell COM type
         createAllShortcuts
-        return $global:EXIT_SUCCESS
+        $status = $global:EXIT_SUCCESS # No exceptions were thrown, so we succeeded.
+    } catch {
+        Write-Error $_.Exception.Message
+        Write-Error $_.ScriptStackTrace
+        $status = $global:EXIT_FAILURE
     }
-    catch {
-        Write-Error "[$_.Exception.Message]"
-        Write-Error "Stack Trace: [$_.ScriptStackTrace]"
-        return $global:EXIT_FAILURE
-    }
+    pause # Pause to allow user to see any errors before the window closes. Can't be inside try/catch because we want it to always execute.
+    exit $status # We can't exit until after the pause, because we want the user to see any errors before the window closes.
 }
 
-[int]$status = main
-pause # Pause to allow user to see any errors before the window closes. Can't be inside try/catch because we want it to always execute.
-exit $status
+main
