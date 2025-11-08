@@ -141,6 +141,17 @@ function createDesktopShortcut {
     return $shortcut
 }
 
+<#
+.SYNOPSIS
+    Performs a specified verb on a file. This DOES NOT WORK for Pin to Start or Pin to Taskbar
+    because Microsoft has disabled programmatic pinning.
+.PARAMETER textOfVerbToPerform
+    [string] The text of the verb to perform (e.g., "Pin to Start").
+.PARAMETER fileToPerformVerbOn
+    [string] The file on which to perform the verb.
+.OUTPUTS
+    [System.Void] This function does not return a value.
+#>
 function performVerb
 {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
@@ -155,16 +166,29 @@ function performVerb
     foreach ($verb in $verbs)
     {
         write-host "pinToStartMenu: Found verb: $( $verb.Name )"
-        if ($verb.Name -match $textOfVerbToPerform)
+        [string]$verbPlainText = $verb.Name -replace "&", "" # Remove ampersands used for keyboard shortcuts
+        if ($verbPlainText -match $textOfVerbToPerform)
         {
             $verb.DoIt()
             Write-Host "Performed: $textOfVerbToPerform."
             return
         }
     }
-    Write-Error "Failed to $textOfVerbToPerform"
+    throw "Failed to $textOfVerbToPerform"
 }
 
+<#
+.SYNOPSIS
+    Pins a shortcut to the Start Menu.
+
+    DOES NOT WORK!!!!!!!
+
+    Microsoft has disabled programmatic pinning because it is functionality
+    that is reserved for user preferences and because it was abused by every installer.
+
+.OUTPUTS
+    [System.Void] This function does not return a value.
+#>
 function pinToStartMenu {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
@@ -174,6 +198,11 @@ function pinToStartMenu {
 <#
 .SYNOPSIS
     Pins a shortcut to the Taskbar.
+
+    DOES NOT WORK!!!!!!!
+
+    Microsoft has disabled programmatic pinning because it is functionality
+    that is reserved for user preferences and because it was abused by every installer.
 
 .PARAMETER targetShortcut
     [System.__ComObject] A WshShortcut COM object to be pinned
@@ -194,8 +223,6 @@ function createAllShortcuts {
     param() # This is required to be here or the above OutputType attribute will cause an error.
     [System.__ComObject]$shortcut = createStartMenuEntry # WshShortcut COM type is assigned to $shortcut
     createDesktopShortcut
-    pinToStartMenu $shortcut
-    pinToTaskbar $shortcut
 }
 
 function main {
