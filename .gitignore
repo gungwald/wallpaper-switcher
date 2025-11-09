@@ -1,10 +1,20 @@
-.idea/
-*.iml
-*.class
-classes/
-out/
-build/
 # Vim backup files
 .*.swp
+.*.swo
+*~
+
 # Java dump files
 hs_err_pid*.log
+
+# MacOS files
+.DS_Store
+Thumbs.db
+
+# IntelliJ
+.idea/
+
+# Build output
+/out/
+/build/
+dist/
+target/

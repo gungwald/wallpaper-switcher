@@ -221,7 +221,7 @@ function pinToTaskbar {
 function createAllShortcuts {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    [System.__ComObject]$shortcut = createStartMenuEntry # WshShortcut COM type is assigned to $shortcut
+    createStartMenuEntry
     createDesktopShortcut
 }
 
@@ -230,11 +230,11 @@ function main {
         $global:wshShell = New-Object -ComObject WScript.Shell # $wshShell gets an object of WshShell COM type
         $global:shellApp = New-Object -ComObject Shell.Application # $shellApp gets an object of Shell COM type
         createAllShortcuts
-        $status = $global:EXIT_SUCCESS # No exceptions were thrown, so we succeeded.
+        $status = 0
     } catch {
         Write-Error $_.Exception.Message
         Write-Error $_.ScriptStackTrace
-        $status = $global:EXIT_FAILURE
+        $status = 1
     }
     pause # Pause to allow user to see any errors before the window closes. Can't be inside try/catch because we want it to always execute.
     exit $status # We can't exit until after the pause, because we want the user to see any errors before the window closes.
