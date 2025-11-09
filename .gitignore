@@ -12,6 +12,7 @@ Thumbs.db
 
 # IntelliJ
 .idea/
+*.iml
 
 # Build output
 /out/

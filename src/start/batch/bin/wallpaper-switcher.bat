@@ -41,8 +41,17 @@ rem Define constants
 set COMMAND_NOT_FOUND=9009
 set REQUIRED_JAVA_VERSION=8
 set JAVA_DOWNLOAD_URLS=https://adoptium.net or https://learn.microsoft.com/en-us/java/openjdk/download
-rem Some JVMs require this to allow access to native code.
-set JVM_OPTS=--enable-native-access=ALL-UNNAMED
+set JAVA_VERSION_WITH_NATIVE_ACCESS_RESTRICTED=22
+
+rem Determine the directory this script is in.
+set SCRIPT_DIR=%~dp0
+rem Remove the trailing backslash. There are cases where it is needed and
+rem cases where it is not needed. Making a decision in every case would be
+rem complex, so just remove it here and always add it when concatenating
+rem paths. Slashes & backslashes are never stored in variables. They are
+rem always added during concatenation. This eliminates confusion about
+rem whether a variable contains a trailing slash or not.
+set SCRIPT_DIR=%SCRIPT_DIR:~0,-1%
 
 rem Check if JAVA_HOME is set and points to a valid java.exe
 if defined JAVA_HOME (
@@ -108,10 +117,14 @@ if %JAVA_MAJOR_VERSION% LSS %REQUIRED_JAVA_VERSION% (
     goto :CHECK_FOR_PAUSE_AT_END
 )
 
+if %JAVA_MAJOR_VERSION% GEQ %JAVA_VERSION_WITH_NATIVE_ACCESS_RESTRICTED% (
+    set JVM_OPTS=%JVM_OPTS% --enable-native-access=ALL-UNNAMED
+)
+
 rem Locate the JAR file. Check in the same directory as this script,
 rem then in ../lib, then in ../share/java.
 set JAR=
-for %%L in ("%~dp0" "%~dp0..\lib" "%~dp0..\share\java") do (
+for %%L in ("%SCRIPT_DIR%" "%SCRIPT_DIR%\..\lib" "%SCRIPT_DIR%\..\share\java") do (
     if exist "%%~L\%~n0.jar" (
         set JAR=%%~L\%~n0.jar
     )
