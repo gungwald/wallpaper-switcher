@@ -2,6 +2,7 @@ To Do
 1. Delete old shortcuts from previous versions.
 2. Separate display of shortcut creation info so that it is easier to read.
 2. Update README.md
+3. Default install directory to FOLDERID_UserProgramFiles
 3. Create a GitHub release with correct version number
 4. Get a wallpaper icon for the shortcut.
 5. Change unzip to not create wallpaper-switcher directory.
