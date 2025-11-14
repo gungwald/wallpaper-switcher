@@ -77,22 +77,21 @@ function makeDirectory {
 
 <#
 .SYNOPSIS
-    Creates a shortcut at the specified path pointing to the target file.
-.PARAMETER targetFile
-    [string] The file that the shortcut will point to.
+    Creates a shortcut at the specified path pointing to Wallpaper Switcher batch file.
 .PARAMETER shortcutPath
-    [string] The path where the shortcut will be created.
+    [string] The shortcut file that will point to the Wallpaper Switcher batch file.
 .OUTPUTS
     [System.__ComObject] A WshShortcut COM object representing the created shortcut.
 #>
-function createShortcut {
+function createShortcutToWS {
     [OutputType([System.__ComObject])] # The COM type is WshShortcut
     param (
-        [string]$targetFile,
         [string]$shortcutPath
     )
     [System.__ComObject]$shortcut = $global:wshShell.CreateShortcut($shortcutPath) # $shortcut gets WshShortcut COM type
-    $shortcut.TargetPath = $targetFile
+    $shortcut.TargetPath = "$PSScriptRoot\wallpaper-switcher.bat" # Always the same for this script
+    $shortcut.WorkingDirectory = $env:USERPROFILE # Set working directory to user's home directory
+    $shortcut.Description = "Update your desktop wallpaper with the daily Bing image." # Always the same for this script
     $shortcut.Save() # This is where the error might occur. It should throw an exception on failure which will be caught in main.
     return $shortcut
 }
@@ -106,7 +105,7 @@ function createShortcut {
 function pause {
     [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    Write-Host "Press any key to continue..." # Same as pause in cmd.exe
+    Write-Host "Press any key to close this window..." # Same as pause in cmd.exe
     [void][System.Console]::ReadKey($FALSE) # Read a key without displaying it and without requiring Enter
 }
 
@@ -119,24 +118,21 @@ function pause {
 function createStartMenuEntry {
     [OutputType([System.__ComObject])] # The COM type is WshShortcut
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
     [string]$shortcutDir = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Wallpaper Switcher"
     makeDirectory -path $shortcutDir
-    [string]$shortcutPath = "$shortcutDir\$shortcutName.lnk" # For current user
-    [System.__ComObject]$shortcut = createShortcut -targetFile $targetFile -shortcutPath $shortcutPath # $shortcut gets WshShortcut COM type
-    Write-Host "Start Menu entry created"
+    [string]$shortcutPath = "$shortcutDir\Wallpaper Switcher.lnk" # For current user
+    [System.__ComObject]$shortcut = createShortcutToWS -shortcutPath $shortcutPath # $shortcut gets WshShortcut COM type
+    Write-Host "Start Menu entries created."
     return $shortcut
 }
 
 function createDesktopShortcut {
     [OutputType([System.__ComObject])] # The COM type is WshShortcut
     param() # This is required to be here or the above OutputType attribute will cause an error.
-    [string]$targetFile = "$PSScriptRoot\wallpaper-switcher.bat"
-    [string]$shortcutName = "Update Wallpaper from Bing" # Desired name for the shortcut
+    [string]$shortcutName = "Wallpaper Switcher" # Desired name for the shortcut
     [string]$desktopPath = [System.Environment]::GetFolderPath("Desktop") # Get the current user's desktop path, CommonDesktop can be used for all users
     [string]$shortcutPath = "$desktopPath\$shortcutName.lnk"
-    [System.__ComObject]$shortcut = createShortcut -targetFile $targetFile -shortcutPath $shortcutPath # COM type WshShortcut is assigned to $shortcut
+    [System.__ComObject]$shortcut = createShortcutToWS -shortcutPath $shortcutPath # COM type WshShortcut is assigned to $shortcut
     Write-host "Desktop shortcut created."
     return $shortcut
 }

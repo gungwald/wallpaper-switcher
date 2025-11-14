@@ -30,7 +30,7 @@ public class Wallpaper {
      */
     public void set(File wallpaper) {
         logger.entering(Wallpaper.class.getName(), "set", wallpaper);
-        System.out.println("Hanging as desktop background...");
+        System.out.println("Hanging as desktop wallpaper...");
         System.out.flush();
         // Set it in the registry
         Advapi32Util.registrySetStringValue(WinReg.HKEY_CURRENT_USER, "Control Panel\\Desktop", "Wallpaper", wallpaper.getAbsolutePath());

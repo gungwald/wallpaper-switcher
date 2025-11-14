@@ -26,8 +26,7 @@ public class WallpaperSwitcher {
     }
 
     public static void main(String[] args) {
-        System.out.println("Running WallpaperSwitcher");
-        System.out.flush();
+        unbufferedPrintln("WallpaperSwitcher started.");
         LOGGER.entering(CLASS_NAME, "main");
         try {
             WallpaperSwitcher ws = new WallpaperSwitcher();
@@ -53,11 +52,8 @@ public class WallpaperSwitcher {
     protected void execute() throws IOException {
         LOGGER.entering(CLASS_NAME, "execute");
         Wallpaper wallpaper = new Wallpaper();
-        com.alteredmechanism.wallpaperswitcher.BingWallpaperAcquirer bing = new com.alteredmechanism.wallpaperswitcher.BingWallpaperAcquirer();
-//        while (true) {
+        BingWallpaperAcquirer bing = new BingWallpaperAcquirer();
         wallpaper.set(bing.next());
-//            sleep(1);
-//        }
         LOGGER.exiting(CLASS_NAME, "execute");
     }
 
@@ -70,4 +66,8 @@ public class WallpaperSwitcher {
         }
     }
 
+    public static void unbufferedPrintln(String s) {
+        System.out.println(s);
+        System.out.flush();
+    }
 }

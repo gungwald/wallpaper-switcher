@@ -155,11 +155,15 @@ rem is important. And it generally is frustrating to users when windows
 rem disappear before they can read the text.
 for /f "tokens=2" %%a in ("%CMDCMDLINE%") do (
     if "%%a"=="/c" (
+        echo This window will close when you press a key.
         pause
     )
 )
 
 rem This can be set before calling this script to ensure a pause happens.
-if "%PAUSE_AT_END%"=="true" pause
+if "%PAUSE_AT_END%"=="true" (
+    echo This window will close when you press a key.
+    pause
+)
 
 endlocal

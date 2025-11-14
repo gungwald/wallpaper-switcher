@@ -28,7 +28,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
 
     public File next() throws IOException {
         URL info = new URL(WALLPAPER_INFO_SRC_LOC);
-        println("Getting URL of today's wallpaper...");
+        unbufferedPrintln("Getting info for today's wallpaper...");
 
         // Read the JSON metadata from Bing
         logger.fine("Reading Bing wallpaper metadata from: " + info.toString());
@@ -43,12 +43,16 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         JsonObject firstImage = json.get("images").getAsJsonArray().get(0).getAsJsonObject();
 
         // Extract & print information about the image
+        unbufferedPrintln();
         String title = firstImage.get("title").getAsString();
-        println("Title: " + title);
+        unbufferedPrintln("     Title:     " + title);
+        unbufferedPrintln();
         String copyright = firstImage.get("copyright").getAsString();
-        println("Copyright: " + copyright);
+        unbufferedPrintln("     Copyright: " + copyright);
+        unbufferedPrintln();
         String copyrightLink = firstImage.get("copyrightlink").getAsString();
-        println("Link: " + copyrightLink);
+        unbufferedPrintln("     More Info: " + copyrightLink);
+        unbufferedPrintln();
 
         // Get the URL of the image
         String path = firstImage.get("url").getAsString();
@@ -58,7 +62,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
 
         // Get the text of the local file name from the query string
         String localFileName = splitQuery(wallpaperUrl).get("id").get(0);
-        printf("Downloading %s...%n", localFileName);
+        unbufferedPrintf("Downloading %s...%n", localFileName);
 
         // Download the raw bytes of the image into a byte array called wallpaper.
         logger.fine("Reading wallpaper from " + wallpaperUrl.toString());
@@ -69,7 +73,7 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         File localFile = new File(wallpaperDir, localFileName);
         logger.fine("Saving to " + localFile.getCanonicalPath());
         logger.fine("Writing wallpaper to " + localFile.getCanonicalPath());
-        printf("Saving in directory %s...%n", wallpaperDir.getCanonicalPath());
+        unbufferedPrintf("Saving in directory %s...%n", wallpaperDir.getCanonicalPath());
         writeAll(localFile, wallpaper);
         return localFile;
     }
@@ -132,13 +136,18 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         }
     }
 
-    public void printf(String message, Object... params) {
+    public void unbufferedPrintf(String message, Object... params) {
         System.out.printf(message, params);
         System.out.flush();
     }
 
-    public void println(String message) {
+    public void unbufferedPrintln(String message) {
         System.out.println(message);
+        System.out.flush();
+    }
+
+    public void unbufferedPrintln() {
+        System.out.println();
         System.out.flush();
     }
 
