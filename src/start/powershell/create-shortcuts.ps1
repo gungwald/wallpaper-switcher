@@ -214,18 +214,12 @@ function pinToTaskbar {
     performVerb "Pin to Taskbar" $targetShortcut.TargetPath
 }
 
-function createAllShortcuts {
-    [OutputType([System.Void])] # This is an attribute, not a command. So it is enclosed in square brackets.
-    param() # This is required to be here or the above OutputType attribute will cause an error.
-    createStartMenuEntry
-    createDesktopShortcut
-}
-
-function main {
+function createShortcuts {
     try {
         $global:wshShell = New-Object -ComObject WScript.Shell # $wshShell gets an object of WshShell COM type
         $global:shellApp = New-Object -ComObject Shell.Application # $shellApp gets an object of Shell COM type
-        createAllShortcuts
+        createStartMenuEntry
+        createDesktopShortcut
         $status = 0
     } catch {
         Write-Error $_.Exception.Message
@@ -236,4 +230,4 @@ function main {
     exit $status # We can't exit until after the pause, because we want the user to see any errors before the window closes.
 }
 
-main
+createShortcuts
