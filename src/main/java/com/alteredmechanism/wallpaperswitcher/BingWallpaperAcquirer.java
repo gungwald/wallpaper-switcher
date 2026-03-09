@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class BingWallpaperAcquirer implements PictureAcquirer {
 
     private static final Logger logger = Logger.getLogger(BingWallpaperAcquirer.class.getName());
-    public static final String WALLPAPER_INFO_SRC_LOC = "http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=en-US";
+    public static final String WALLPAPER_INFO_SRC_LOC = "http://www.bing.com/HPImageArchive.aspx?format=js&idx=";
     public static final String WALLPAPER_TARGET_DIR_SHORT_NAME = "Wallpaper Switcher";
     protected final File wallpaperDir;
 
@@ -26,8 +26,10 @@ public class BingWallpaperAcquirer implements PictureAcquirer {
         wallpaperDir = new File(myPictures, WALLPAPER_TARGET_DIR_SHORT_NAME);
     }
 
-    public File next() throws IOException {
-        URL info = new URL(WALLPAPER_INFO_SRC_LOC);
+    public File next(int day) throws IOException {
+        int absDay = Math.abs(day);
+        String wallpaperSrcUrl = WALLPAPER_INFO_SRC_LOC + absDay + "&n=1&mkt=en-US";
+        URL info = new URL(wallpaperSrcUrl);
         unbufferedPrintln("Getting info for today's wallpaper...");
 
         // Read the JSON metadata from Bing

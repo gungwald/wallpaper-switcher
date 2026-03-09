@@ -10,7 +10,7 @@
     <property name="app.formal.name" value="Wallpaper Switcher"/>
     <property name="main.class" value="com.alteredmechanism.wallpaperswitcher.WallpaperSwitcher"/>
     <property name="vendor" value="Altered Mechanism"/>
-    <property name="targeted.github.release" value="4.1.0"/> <!-- Sync with next github release -->
+    <property name="targeted.github.release" value="4.2.0"/> <!-- Sync with next github release -->
     <property name="compile.target.version" value="1.6"/> <!-- JNA requires Java 6 -->
     <property name="src.dir" value="src/main/java"/>
     <property name="lib.dir" value="lib"/>

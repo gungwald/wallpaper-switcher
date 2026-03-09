@@ -26,11 +26,17 @@ public class WallpaperSwitcher {
     }
 
     public static void main(String[] args) {
+        int day;
         unbufferedPrintln("WallpaperSwitcher started.");
         LOGGER.entering(CLASS_NAME, "main");
         try {
             WallpaperSwitcher ws = new WallpaperSwitcher();
-            ws.execute();
+            if (args.length == 0) {
+                day = 0;
+            } else {
+                day = Integer.parseInt(args[0]);
+            }
+            ws.execute(day);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Caught exception in main", e);
         }
@@ -49,11 +55,11 @@ public class WallpaperSwitcher {
         }
     }
 
-    protected void execute() throws IOException {
+    protected void execute(int day) throws IOException {
         LOGGER.entering(CLASS_NAME, "execute");
         Wallpaper wallpaper = new Wallpaper();
         BingWallpaperAcquirer bing = new BingWallpaperAcquirer();
-        wallpaper.set(bing.next());
+        wallpaper.set(bing.next(day));
         LOGGER.exiting(CLASS_NAME, "execute");
     }
 
